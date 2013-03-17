@@ -1,11 +1,16 @@
 {
-	"name": "sonos-discovery",
-	"version": "0.0.1",
-	"description": "A simple node module for finding players and controlling them",
-	"author": "Jimmy Shimizu <jimmy@shimizu.se>",	
-	"dependencies": {
-		"sax": "0.5.x",
-		"xml2js": "0.2.x"
-	},
-	"engine": "node 0.8.x"
+  "name": "sonos-discovery",
+  "version": "0.0.1",
+  "description": "A simple node module for finding players and controlling them",
+  "author": "Jimmy Shimizu <jimmy@shimizu.se>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jishi/node-sonos-discovery.git"
+  },
+  "dependencies": {
+    "sax": "0.5.x",
+    "xml2js": "0.2.x"
+  },
+  "engine": "node 0.8.x",
+  "main": "lib/sonos.js"
 }
