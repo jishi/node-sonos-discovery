@@ -1,6 +1,6 @@
 {
   "name": "sonos-discovery",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A simple node module for finding players and controlling them",
   "author": "Jimmy Shimizu <jimmy@shimizu.se>",
   "repository": {
@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "sax": "0.5.x",
-    "xml2js": "0.2.x"
+    "xml2js": "0.2.x",
+    "async": "0.2.x"
   },
   "engine": "node 0.8.x",
   "main": "lib/sonos.js"
