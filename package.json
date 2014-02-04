@@ -8,8 +8,7 @@
     "url": "https://github.com/jishi/node-sonos-discovery.git"
   },
   "dependencies": {
-    "sax": "0.5.x",
-    "xml2js": "0.2.x",
+    "easysax": "0.1.x",
     "async": "0.2.x",
     "html-entities": "1.0.x"
   },
