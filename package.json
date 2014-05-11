@@ -1,6 +1,6 @@
 {
   "name": "sonos-discovery",
-  "version": "0.9.4",
+  "version": "0.10.0",
   "description": "A simple node module for finding players and controlling them",
   "author": "Jimmy Shimizu <jimmy@shimizu.se>",
   "repository": {
