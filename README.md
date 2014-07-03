@@ -8,4 +8,5 @@ This is a simplification of the Sonos implementation of UPnP for the node.js sta
 For example integrations, please see the following projects:
 
 https://github.com/jishi/node-sonos-http-api
+
 https://github.com/jishi/node-sonos-web-controller
