@@ -11,7 +11,8 @@
     "async": "0.2.x",
     "easysax": "0.1.x",
     "html-entities": "1.0.x",
-    "winston": "0.8.3"
+    "winston": "0.8.3",
+    "node-ssdp" : "2.2.1"
   },
   "engine": "node 0.8.x",
   "main": "lib/sonos.js"
