@@ -9,10 +9,19 @@
   },
   "dependencies": {
     "async": "0.2.x",
+    "bluebird": "2.10.x",
     "easysax": "0.1.x",
     "html-entities": "1.0.x",
-    "winston": "0.8.3"
+    "request-promise": "^1.0.2",
+    "require-fu": "^1.0.0",
+    "rewire": "^2.3.4",
+    "winston": "0.8.3",
+    "xml2js": "^0.4.15"
   },
-  "engine": "node 0.8.x",
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
+  },
+  "engine": "node 4.x.x",
   "main": "lib/sonos.js"
 }
