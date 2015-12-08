@@ -11,7 +11,7 @@ describe('deezer', function () {
 
     apiStub(servicesContainer);
 
-    deezer = servicesContainer[7];
+    deezer = servicesContainer[2];
   });
 
   it('should load highres art', () => {
