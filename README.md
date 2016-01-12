@@ -1,5 +1,5 @@
 node-sonos-discovery
-====================
+--------------------
 
 This is a simplification of the Sonos implementation of UPnP for the node.js stack. This library will allow you to interact with your sonos system with simple commands like play, pause, next etc, but is expected to be ran at all times because it keeps track of the players.
 
@@ -13,9 +13,18 @@ https://github.com/jishi/node-sonos-web-controller
 
 
 Options
-=======
+-------
 
 You can pass a settings object to the discovery function, possible options are:
 
 - log: (object) logger instance
 - disableIpDiscovery: (boolean) if set to true, sonos-discovery will listen on 0.0.0.0 to detect all sonos players, else sonos-discovery will listen on all detected IPv4 interfaces (excluding localhost)
+
+Contributions
+-------------
+
+If you are sending a pull request, please run:
+
+`npm test`
+
+Before submitting it, to validate syntax with jscs and run the few tests in there. Thank you!
