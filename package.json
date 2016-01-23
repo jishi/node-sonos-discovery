@@ -14,7 +14,6 @@
     "html-entities": "1.0.x",
     "request-promise": "^1.0.2",
     "require-fu": "^1.0.0",
-    "rewire": "^2.3.4",
     "winston": "0.8.3",
     "xml2js": "^0.4.15"
   },
@@ -22,7 +21,11 @@
     "chai": "*",
     "jscs": "^2.8.0",
     "jshint": "^2.9.1-rc2",
-    "mocha": "*"
+    "mocha": "*",
+    "proxyquire": "^1.7.3",
+    "rewire": "^2.3.4",
+    "sinon": "^1.17.2",
+    "sinon-chai": "^2.8.0"
   },
   "engine": "node 4.x.x",
   "main": "lib/sonos.js",
