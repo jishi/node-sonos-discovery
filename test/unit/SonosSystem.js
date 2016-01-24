@@ -9,6 +9,8 @@ describe('SonosSystem', () => {
   let ssdp;
   let sonos;
   let request;
+  let NotificationListener;
+  let listener;
 
   beforeEach(() => {
     ssdp = {
@@ -19,9 +21,16 @@ describe('SonosSystem', () => {
 
     request = sinon.stub();
 
+    listener = {
+      on: sinon.spy()
+    };
+
+    NotificationListener = sinon.stub().returns(listener);
+
     SonosSystem = proxyquire('../../lib/SonosSystem', {
       './sonos-ssdp': ssdp,
-      'request-promise': request
+      './helpers/request': request,
+      './NotificationListener': NotificationListener
     });
 
     sonos = new SonosSystem();
@@ -43,7 +52,11 @@ describe('SonosSystem', () => {
     expect(request.firstCall.args[0].headers).eql({
       NT: 'upnp:event',
       CALLBACK: '<http://127.0.0.1:3500/>',
-      TIMEOUT: 'Second-3600'
+      TIMEOUT: 'Second-600'
     });
+  });
+
+  it('Starts a NotificationListener', () => {
+    expect(NotificationListener).calledWithNew;
   });
 });

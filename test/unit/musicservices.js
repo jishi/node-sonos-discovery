@@ -17,7 +17,7 @@ describe('MusicServices', function () {
       .then(() => {
         throw new Error('Should not resolve');
       }, () => {
-        console.log('Rejected successfully');
+
       });
   });
 

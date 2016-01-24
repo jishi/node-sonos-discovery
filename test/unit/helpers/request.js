@@ -5,7 +5,7 @@ const proxyquire = require('proxyquire');
 const Readable = require('stream').Readable;
 require('chai').use(require('sinon-chai'));
 
-describe.only('request', () => {
+describe('request', () => {
   let http;
   let request;
   let client;
@@ -89,12 +89,30 @@ describe.only('request', () => {
       uri: 'http://127.0.0.1/path'
     }).then(() => {
       expect().fail();
-      })
-      .catch((e) => {
-        expect(e).instanceOf(Error);
-      });
+    }).catch((e) => {
+      expect(e).instanceOf(Error);
+    });
 
     client.on.withArgs('error').yield(new Error());
+
+    return promise;
+  });
+
+  it('Rejects if response code is other than 2xx', () => {
+    let promise = request({
+      uri: 'http://127.0.0.1/path'
+    }).then(() => {
+      expect().fail();
+    }).catch((e) => {
+      expect(e).instanceOf(Error);
+      expect(e.statusCode).equals(500);
+      expect(e.message).equals('This is an error');
+    });
+
+    http.request.yield({
+      statusCode: 500,
+      statusMessage: 'This is an error'
+    });
 
     return promise;
   });
