@@ -82,7 +82,7 @@ describe('Sonos-SSDP', function () {
     });
   });
 
-  it('Closes socket if player is found', () => {
+  it('Closes socket if stop is invoked', () => {
     ssdp.start();
     ssdp.stop();
 
