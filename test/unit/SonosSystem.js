@@ -102,7 +102,7 @@ describe('SonosSystem', () => {
     });
   });
 
-  it.only('Populates zone on topology notification', (done) => {
+  it('Populates zone on topology notification', (done) => {
     ssdp.on.yield({
       ip: '127.0.0.1',
       location: 'http://127.0.0.1:1400/xml',
