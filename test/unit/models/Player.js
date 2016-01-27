@@ -47,7 +47,8 @@ describe('Player', () => {
     });
 
     listener = {
-      endpoint: sinon.stub().returns('http://127.0.0.2/')
+      endpoint: sinon.stub().returns('http://127.0.0.2/'),
+      on: sinon.spy()
     };
 
     player = new Player(zoneMemberData, listener);
@@ -76,5 +77,26 @@ describe('Player', () => {
   it('Invokes dispose on all listeners when disposing player', () => {
     player.dispose();
     expect(subscriber.dispose).callCount(3);
+  });
+
+  it('Subscribes to listener events', () => {
+    expect(listener.on).calledOnce;
+  });
+
+  it('Updates state when last change event occur', () => {
+    let lastChange = require('../../data/lastchange.json');
+    listener.on.yield('RINCON_00000000000001400', lastChange);
+
+    expect(player.state.currentState).equals('PLAYING');
+    expect(player.state.trackNo).equals(43);
+    expect(player.state.currentTrack).eql({
+      artist: 'Johannes Brahms',
+      title: 'Intermezzo No. 3 in C-sharp minor, Op. 117 - Andante con moto',
+      album: 'Glenn Gould plays Brahms: 4 Ballades op. 10; 2 Rhapsodies op. 79; 10 Intermezzi',
+      albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a5qAFqkXoQd2RfjZ2j1ay0w%3fsid%3d9%26flags%3d8224%26sn%3d9',
+      duration: 318,
+      uri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
+      radioShowMetaData: ''
+    });
   });
 });
