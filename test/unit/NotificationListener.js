@@ -68,7 +68,7 @@ describe('NotificationListener', () => {
 
   });
 
-  it('Emits last-change on LastChange', (done) => {
+  it('Emits last-change on AvTransport LastChange', (done) => {
     let listener = sinon.spy(function () {
       expect(listener).calledOnce;
       expect(listener.firstCall.args[0]).equal('RINCON_12345678900001400');
@@ -78,7 +78,30 @@ describe('NotificationListener', () => {
     });
 
     notificationListener.on('last-change', listener);
-    let xmlStream = fs.createReadStream(__dirname + '/../data/lastchange.xml');
+    let xmlStream = fs.createReadStream(__dirname + '/../data/avtransportlastchange.xml');
+    xmlStream.method = 'NOTIFY';
+    xmlStream.headers = {
+      sid: 'uuid:RINCON_12345678900001400_sub'
+    };
+    http.createServer.yield(xmlStream);
+  });
+
+  it('Emits last-change on RenderingControl LastChange', (done) => {
+    let listener = sinon.spy(function () {
+      setImmediate(() => {
+        expect(listener).calledOnce;
+        expect(listener.firstCall.args[0]).equal('RINCON_12345678900001400');
+        expect(listener.firstCall.args[1].volume).not.empty;
+        let masterVolume = listener.firstCall.args[1].volume.find((x) => {
+          return x.channel === 'Master';
+        });
+        expect(masterVolume.val).equal('12');
+        done();
+      });
+    });
+
+    notificationListener.on('last-change', listener);
+    let xmlStream = fs.createReadStream(__dirname + '/../data/renderingcontrollastchange.xml');
     xmlStream.method = 'NOTIFY';
     xmlStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'

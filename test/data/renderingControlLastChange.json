@@ -1,0 +1,20 @@
+{
+  "$name": "instanceid",
+  "$attrs": {
+    "val": "0"
+  },
+  "volume": [
+    {
+      "channel": "Master",
+      "val": "12"
+    },
+    {
+      "channel": "LF",
+      "val": "100"
+    },
+    {
+      "channel": "RF",
+      "val": "100"
+    }
+  ]
+}

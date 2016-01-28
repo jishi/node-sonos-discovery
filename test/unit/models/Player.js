@@ -84,7 +84,7 @@ describe('Player', () => {
   });
 
   it('Updates state when last change event occur', () => {
-    let lastChange = require('../../data/lastchange.json');
+    let lastChange = require('../../data/avtransportlastchange.json');
     listener.on.yield('RINCON_00000000000001400', lastChange);
 
     expect(player.state.currentState).equals('PLAYING');
@@ -98,5 +98,21 @@ describe('Player', () => {
       uri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
       radioShowMetaData: ''
     });
+
+    expect(player.state.nextTrack).eql({
+      artist: 'Coheed and Cambria',
+      title: 'Here To Mars',
+      album: 'The Color Before The Sun',
+      albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a0Ap3aOVU7LItcHIFiRF8lY%3fsid%3d9%26flags%3d8224%26sn%3d9',
+      duration: 241,
+      uri: 'x-sonos-spotify:spotify%3atrack%3a0Ap3aOVU7LItcHIFiRF8lY?sid=9&flags=8224&sn=9'
+    });
+  });
+
+  it('Updates volume when notification occurs', () => {
+    let lastChange = require('../../data/renderingControlLastChange.json');
+    listener.on.yield('RINCON_00000000000001400', lastChange);
+
+    expect(player.state.volume).equals(12);
   });
 });
