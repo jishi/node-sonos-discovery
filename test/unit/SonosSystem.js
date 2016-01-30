@@ -66,7 +66,7 @@ describe('SonosSystem', () => {
     setImmediate(() => {
       expect(sonos.localEndpoint).equals('127.0.0.2');
       done();
-    })
+    });
   });
 
   it('Starts a NotificationListener', (done) => {
@@ -79,7 +79,7 @@ describe('SonosSystem', () => {
     setImmediate(() => {
       expect(NotificationListener).calledWithNew;
       done();
-    })
+    });
   });
 
   it('Subscribes to player when ssdp emits', (done) => {
@@ -113,6 +113,6 @@ describe('SonosSystem', () => {
       listener.on.withArgs('topology').yield('', topology);
       expect(sonos.zones).not.empty;
       done();
-    })
+    });
   });
 });

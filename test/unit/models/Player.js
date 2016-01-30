@@ -107,6 +107,12 @@ describe('Player', () => {
       duration: 241,
       uri: 'x-sonos-spotify:spotify%3atrack%3a0Ap3aOVU7LItcHIFiRF8lY?sid=9&flags=8224&sn=9'
     });
+
+    expect(player.state.playMode).eql({
+      repeat: true,
+      shuffle: true,
+      crossfade: true
+    });
   });
 
   it('Updates volume when notification occurs', () => {

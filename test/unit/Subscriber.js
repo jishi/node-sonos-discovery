@@ -19,7 +19,7 @@ describe('Subscriber', () => {
 
   it('Sends a subscription with the correct parameters', () => {
     request.resolves({});
-    let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
+    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
     expect(request).calledOnce;
     expect(request.firstCall.args[0]).eql({
       url: 'http://192.168.1.151:1400/test/path',
@@ -35,7 +35,7 @@ describe('Subscriber', () => {
   it('Resubscribes if failure', function (done) {
     this.timeout(5500);
     request.rejects('error');
-    let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
+    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
 
     setTimeout(() => {
 

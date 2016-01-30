@@ -16,7 +16,7 @@ describe('NotificationListener', () => {
     server = {
       listen: sinon.spy(),
       on: sinon.spy()
-    }
+    };
     http = {
       createServer: sinon.stub().returns(server)
     };
@@ -31,6 +31,7 @@ describe('NotificationListener', () => {
     // Avoid not implemented warning
     mockedStream._read = function noop() {
     };
+
     mockedStream.method = 'NOTIFY';
     mockedStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'
