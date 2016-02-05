@@ -34,7 +34,7 @@
     },
     "zonegroupmember": [
       {
-        "uuid": "RINCON_00000000000001400",
+        "uuid": "RINCON_10000000000001400",
         "location": "http://192.168.1.155:1400/xml/device_description.xml",
         "zonename": "TV Room",
         "icon": "x-rincon-roomicon:tvroom",
@@ -43,7 +43,7 @@
         "softwareversion": "31.8-24090",
         "mincompatibleversion": "29.0-00000",
         "legacycompatibleversion": "24.0-00000",
-        "channelmapset": "RINCON_00000000000001400:LF,RF;RINCON_00000000000001400:SW,SW",
+        "channelmapset": "RINCON_20000000000001400:LF,RF;RINCON_10000000000001400:SW,SW",
         "bootseq": "21",
         "wirelessmode": "0",
         "hasconfiguredssid": "0",
@@ -90,7 +90,7 @@
         "sonarstate": "4"
       },
       {
-        "uuid": "RINCON_00000000000001400",
+        "uuid": "RINCON_20000000000001400",
         "location": "http://192.168.1.154:1400/xml/device_description.xml",
         "zonename": "TV Room",
         "icon": "x-rincon-roomicon:tvroom",
@@ -98,7 +98,7 @@
         "softwareversion": "31.8-24090",
         "mincompatibleversion": "29.0-00000",
         "legacycompatibleversion": "24.0-00000",
-        "channelmapset": "RINCON_00000000000001400:LF,RF;RINCON_00000000000001400:SW,SW",
+        "channelmapset": "RINCON_20000000000001400:LF,RF;RINCON_10000000000001400:SW,SW",
         "bootseq": "113",
         "wirelessmode": "0",
         "hasconfiguredssid": "0",

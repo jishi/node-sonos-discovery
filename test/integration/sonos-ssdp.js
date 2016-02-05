@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 require('chai').use(require('sinon-chai'));
 
-describe.only('Make sure it finds players', () => {
+describe('Make sure it finds players', () => {
   let ssdp;
 
   beforeEach(() => {

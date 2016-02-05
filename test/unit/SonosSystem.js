@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
+const Player = require('../../lib/models/Player');
 
 describe('SonosSystem', () => {
   let SonosSystem;
@@ -51,45 +52,33 @@ describe('SonosSystem', () => {
     expect(ssdp.start).calledOnce;
   });
 
-  it('Finds local endpoint', (done) => {
+  context('topology done', () => {
 
-    ssdp.on.yield({
-      ip: '127.0.0.1',
-      location: 'http://127.0.0.1:1400/xml',
-      household: 'Sonos_1234567890abcdef'
+    beforeEach((done) => {
+      ssdp.on.yield({
+        ip: '127.0.0.1',
+        location: 'http://127.0.0.1:1400/xml',
+        household: 'Sonos_1234567890abcdef'
+      });
+
+      setImmediate(() => {
+        done();
+      });
     });
 
-    expect(request).calledOnce;
-    expect(request.firstCall.args[0].method).equals('HEAD');
-    expect(request.firstCall.args[0].uri).equals('http://127.0.0.1:1400/xml');
-
-    setImmediate(() => {
+    it('Finds local endpoint', () => {
+      expect(request).called;
+      expect(request.firstCall.args[0].method).equals('HEAD');
+      expect(request.firstCall.args[0].uri).equals('http://127.0.0.1:1400/xml');
       expect(sonos.localEndpoint).equals('127.0.0.2');
-      done();
-    });
-  });
-
-  it('Starts a NotificationListener', (done) => {
-    ssdp.on.yield({
-      ip: '127.0.0.1',
-      location: 'http://127.0.0.1:1400/xml',
-      household: 'Sonos_1234567890abcdef'
     });
 
-    setImmediate(() => {
+    it('Starts a NotificationListener', () => {
       expect(NotificationListener).calledWithNew;
-      done();
-    });
-  });
-
-  it('Subscribes to player when ssdp emits', (done) => {
-    ssdp.on.yield({
-      ip: '127.0.0.1',
-      location: 'http://127.0.0.1:1400/xml',
-      household: 'Sonos_1234567890abcdef'
     });
 
-    setImmediate(() => {
+    it('Subscribes to player when ssdp emits', () => {
+
       expect(request).calledTwice;
       expect(request.secondCall.args[0].method).equals('SUBSCRIBE');
       expect(request.secondCall.args[0].uri).equals('http://127.0.0.1:1400/ZoneGroupTopology/Event');
@@ -98,42 +87,40 @@ describe('SonosSystem', () => {
         CALLBACK: '<http://127.0.0.2:3500/>',
         TIMEOUT: 'Second-600'
       });
-      done();
-    });
-  });
 
-  it('Populate zones on topology notification', (done) => {
-    ssdp.on.yield({
-      ip: '127.0.0.1',
-      location: 'http://127.0.0.1:1400/xml',
-      household: 'Sonos_1234567890abcdef'
     });
-    let topology = require('../data/topology.json');
-    setImmediate(() => {
+
+    it('Populate zones on topology notification', () => {
+      let topology = require('../data/topology.json');
       listener.on.withArgs('topology').yield('', topology);
       expect(sonos.zones).not.empty;
       sonos.zones.forEach((zone) => {
         expect(zone.members).not.empty;
+        zone.members.forEach((member) => {
+          expect(member).instanceOf(Player);
+        })
       });
-      done();
     });
-  });
 
-  it('Do not contain Invisible units', (done) => {
-    ssdp.on.yield({
-      ip: '127.0.0.1',
-      location: 'http://127.0.0.1:1400/xml',
-      household: 'Sonos_1234567890abcdef'
-    });
-    let topology = require('../data/topology.json');
-    setImmediate(() => {
+    it('Do not contain Invisible units', () => {
+      let topology = require('../data/topology.json');
       listener.on.withArgs('topology').yield('', topology);
       sonos.zones.forEach((zone) => {
         return zone.members.forEach((member) => {
           expect(member.roomName).not.equal('BOOST');
         });
       });
-      done();
+    });
+
+    it('Attaches SUB to primary player', () => {
+      let topology = require('../data/topology.json');
+      listener.on.withArgs('topology').yield('', topology);
+      sonos.zones.forEach((zone) => {
+        let tvRoom = zone.members.find((member) => member.roomName === 'TV Room');
+        expect(tvRoom).not.undefined;
+        expect(tvRoom.sub).not.undefined;
+        expect(tvRoom.sub.roomName).equal('TV Room (SUB)');
+      });
     });
   });
 });
