@@ -33,9 +33,8 @@ describe('Subscriber', () => {
   });
 
   it('Resubscribes if failure', function (done) {
-    this.timeout(5500);
     request.rejects('error');
-    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
+    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600, 10);
 
     setTimeout(() => {
 
@@ -50,14 +49,14 @@ describe('Subscriber', () => {
         }
       });
       done();
-    }, 5100);
+    }, 15);
   });
 
   it('Resubscribes right before timeout', (done) => {
     request.resolves({
       SID: '1234567890'
     });
-    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 1);
+    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
 
     setTimeout(() => {
       expect(request).calledTwice;
@@ -67,19 +66,19 @@ describe('Subscriber', () => {
         headers: {
           CALLBACK: '<http://127.0.0.2/>',
           NT: 'upnp:event',
-          TIMEOUT: 'Second-1',
+          TIMEOUT: 'Second-0.1',
           SID: '1234567890'
         }
       });
       done();
-    }, 900);
+    }, 90);
   });
 
   it('Stops renewing if dispose is called', (done) => {
     request.resolves({
       SID: '1234567890'
     });
-    let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 1);
+    let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
 
     setImmediate(() => {
       subscriber.dispose();
@@ -88,6 +87,6 @@ describe('Subscriber', () => {
     setTimeout(() => {
       expect(request).calledOnce;
       done();
-    }, 900);
+    }, 90);
   });
 });

@@ -102,7 +102,7 @@ describe('SonosSystem', () => {
     });
   });
 
-  it('Populates zone on topology notification', (done) => {
+  it('Populate zones on topology notification', (done) => {
     ssdp.on.yield({
       ip: '127.0.0.1',
       location: 'http://127.0.0.1:1400/xml',
@@ -112,6 +112,27 @@ describe('SonosSystem', () => {
     setImmediate(() => {
       listener.on.withArgs('topology').yield('', topology);
       expect(sonos.zones).not.empty;
+      sonos.zones.forEach((zone) => {
+        expect(zone.members).not.empty;
+      });
+      done();
+    });
+  });
+
+  it('Do not contain Invisible units', (done) => {
+    ssdp.on.yield({
+      ip: '127.0.0.1',
+      location: 'http://127.0.0.1:1400/xml',
+      household: 'Sonos_1234567890abcdef'
+    });
+    let topology = require('../data/topology.json');
+    setImmediate(() => {
+      listener.on.withArgs('topology').yield('', topology);
+      sonos.zones.forEach((zone) => {
+        return zone.members.forEach((member) => {
+          expect(member.roomName).not.equal('BOOST');
+        });
+      });
       done();
     });
   });
