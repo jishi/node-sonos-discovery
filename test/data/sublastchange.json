@@ -1,0 +1,21 @@
+{
+  "$name": "instanceid",
+  "$attrs": {
+    "val": "0"
+  },
+  "speakersize": {
+    "val": "1"
+  },
+  "subgain": {
+    "val": "-3"
+  },
+  "subcrossover": {
+    "val": "90"
+  },
+  "subpolarity": {
+    "val": "0"
+  },
+  "subenabled": {
+    "val": "1"
+  }
+}

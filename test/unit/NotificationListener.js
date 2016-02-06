@@ -141,4 +141,27 @@ describe('NotificationListener', () => {
     };
     http.createServer.yield(xmlStream);
   });
+
+  it('Emits last-change for SUB rendering control last change event', (done) => {
+    let listener = sinon.spy(function () {
+      setImmediate(() => {
+        console.log(JSON.stringify(listener.firstCall.args[1]));
+        expect(listener).calledOnce;
+        expect(listener.firstCall.args[0]).equal('RINCON_12345678900001400');
+        expect(listener.firstCall.args[1].subgain.val).equal('-3');
+        expect(listener.firstCall.args[1].subcrossover.val).equal('90');
+        expect(listener.firstCall.args[1].subenabled.val).equal('1');
+        expect(listener.firstCall.args[1].subpolarity.val).equal('0');
+        done();
+      });
+    });
+
+    notificationListener.on('last-change', listener);
+    let xmlStream = fs.createReadStream(__dirname + '/../data/sublastchange.xml');
+    xmlStream.method = 'NOTIFY';
+    xmlStream.headers = {
+      sid: 'uuid:RINCON_12345678900001400_sub'
+    };
+    http.createServer.yield(xmlStream);
+  });
 });

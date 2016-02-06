@@ -76,7 +76,12 @@ describe('Sub', () => {
     expect(subscriber.dispose).calledOnce;
   });
 
-  it('Updates SubGain when event occurs', () => {
-
+  it('Updates properties when event occurs', () => {
+    let lastChange = require('../../data/sublastchange.json');
+    listener.on.yield('RINCON_10000000000001400', lastChange);
+    expect(sub.gain).equal(-3);
+    expect(sub.crossover).equal(90);
+    expect(sub.polarity).equal(0);
+    expect(sub.enabled).equal(true);
   });
 });
