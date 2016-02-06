@@ -14,7 +14,8 @@ describe('Sonos-SSDP', function () {
       bind: sinon.spy(),
       setMulticastTTL: sinon.spy(),
       close: sinon.spy(),
-      send: sinon.spy()
+      send: sinon.spy(),
+      on: sinon.spy()
     };
     dgram = {
       createSocket: sinon.stub().returns(socket)

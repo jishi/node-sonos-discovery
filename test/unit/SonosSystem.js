@@ -4,7 +4,6 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
-const Player = require('../../lib/models/Player');
 
 describe('SonosSystem', () => {
   let SonosSystem;
@@ -14,6 +13,8 @@ describe('SonosSystem', () => {
   let NotificationListener;
   let listener;
   let Subscriber;
+  let Player;
+  let Sub;
 
   beforeEach(() => {
     ssdp = {
@@ -42,11 +43,21 @@ describe('SonosSystem', () => {
 
     Subscriber = sinon.spy();
 
+    Player = sinon.spy(proxyquire('../../lib/models/Player', {
+      '../Subscriber': Subscriber
+    }));
+
+    Sub = sinon.spy(proxyquire('../../lib/models/Sub', {
+    '../Subscriber': Subscriber
+  }));
+
     SonosSystem = proxyquire('../../lib/SonosSystem', {
       './sonos-ssdp': ssdp,
       './helpers/request': request,
       './NotificationListener': NotificationListener,
-      './Subscriber': Subscriber
+      './Subscriber': Subscriber,
+      './models/Player': Player,
+      './models/Sub': Sub
     });
 
     sonos = new SonosSystem();
@@ -100,36 +111,61 @@ describe('SonosSystem', () => {
 
     });
 
-    it('Populate zones on topology notification', () => {
-      let topology = require('../data/topology.json');
-      listener.on.withArgs('topology').yield('', topology);
-      expect(sonos.zones).not.empty;
-      sonos.zones.forEach((zone) => {
-        expect(zone.members).not.empty;
-        zone.members.forEach((member) => {
-          expect(member).instanceOf(Player);
+    context('topology', () => {
+
+      beforeEach(() => {
+        let topology = require('../data/topology.json');
+        listener.on.withArgs('topology').yield('', topology);
+      });
+
+      it('Populate zones on topology notification', () => {
+        expect(sonos.zones).not.empty;
+        sonos.zones.forEach((zone) => {
+          expect(zone.members).not.empty;
+          zone.members.forEach((member) => {
+            expect(member).instanceOf(Player);
+          });
         });
       });
-    });
 
-    it('Do not contain Invisible units', () => {
-      let topology = require('../data/topology.json');
-      listener.on.withArgs('topology').yield('', topology);
-      sonos.zones.forEach((zone) => {
-        return zone.members.forEach((member) => {
-          expect(member.roomName).not.equal('BOOST');
+      it('Populate players on topology notification', () => {
+        expect(sonos.players).not.empty;
+        let player = sonos.getPlayer('TV Room');
+        expect(player.roomName).equal('TV Room');
+      });
+
+      it('Do not contain Invisible units', () => {
+        sonos.zones.forEach((zone) => {
+          return zone.members.forEach((member) => {
+            expect(member.roomName).not.equal('BOOST');
+          });
         });
       });
-    });
 
-    it('Attaches SUB to primary player', () => {
-      let topology = require('../data/topology.json');
-      listener.on.withArgs('topology').yield('', topology);
-      sonos.zones.forEach((zone) => {
-        let tvRoom = zone.members.find((member) => member.roomName === 'TV Room');
-        expect(tvRoom).not.undefined;
-        expect(tvRoom.sub).not.undefined;
-        expect(tvRoom.sub.roomName).equal('TV Room (SUB)');
+      it('Attaches SUB to primary player', () => {
+        sonos.zones.forEach((zone) => {
+          let tvRoom = zone.members.find((member) => member.roomName === 'TV Room');
+          expect(tvRoom).not.undefined;
+          expect(tvRoom.sub).not.undefined;
+          expect(tvRoom.sub.roomName).equal('TV Room (SUB)');
+        });
+      });
+
+      it('Only creates player and sub once', () => {
+        let topology = require('../data/topology.json');
+        listener.on.withArgs('topology').yield('', topology);
+        expect(Player).callCount(5);
+        expect(Sub).calledOnce;
+      });
+
+      it('Links coordinator property on all players', () => {
+        sonos.zones.forEach((zone) => {
+          let coordinatorUuid = zone.uuid;
+          zone.members.forEach((player) => {
+            expect(player.coordinator).instanceOf(Player);
+            expect(player.coordinator.uuid).equal(coordinatorUuid);
+          });
+        });
       });
     });
   });

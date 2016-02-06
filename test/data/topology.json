@@ -29,8 +29,8 @@
   {
     "$name": "zonegroup",
     "$attrs": {
-      "coordinator": "RINCON_00000000000001400",
-      "id": "RINCON_00000000000001400:66"
+      "coordinator": "RINCON_00000000000301400",
+      "id": "RINCON_00000000000301400:66"
     },
     "zonegroupmember": [
       {
@@ -54,7 +54,7 @@
         "sonarstate": "4"
       },
       {
-        "uuid": "RINCON_00000000000001400",
+        "uuid": "RINCON_00000000000101400",
         "location": "http://192.168.1.151:1400/xml/device_description.xml",
         "zonename": "Kitchen",
         "icon": "x-rincon-roomicon:kitchen",
@@ -72,7 +72,7 @@
         "sonarstate": "4"
       },
       {
-        "uuid": "RINCON_00000000000001400",
+        "uuid": "RINCON_00000000000201400",
         "location": "http://192.168.1.153:1400/xml/device_description.xml",
         "zonename": "Bedroom",
         "icon": "x-rincon-roomicon:bedroom",
@@ -109,7 +109,7 @@
         "sonarstate": "4"
       },
       {
-        "uuid": "RINCON_00000000000001400",
+        "uuid": "RINCON_00000000000301400",
         "location": "http://192.168.1.157:1400/xml/device_description.xml",
         "zonename": "Bathroom",
         "icon": "x-rincon-roomicon:bathroom",
@@ -127,7 +127,7 @@
         "sonarstate": "4"
       },
       {
-        "uuid": "RINCON_00000000000001400",
+        "uuid": "RINCON_00000000000401400",
         "location": "http://192.168.1.156:1400/xml/device_description.xml",
         "zonename": "Office",
         "icon": "x-rincon-roomicon:office",

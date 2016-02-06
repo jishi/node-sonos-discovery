@@ -128,27 +128,80 @@ describe('Player', () => {
     expect(player.state.volume).equals(12);
   });
 
-  context.only('Basic commands', () => {
+  context('Basic commands', () => {
     let TYPE = require('../../../lib/helpers/soap').TYPE;
 
-    const cases = [
-      { type: TYPE.Play, action: 'play' },
-      { type: TYPE.Pause, action: 'pause' },
-      { type: TYPE.Next, action: 'nextTrack' },
-      { type: TYPE.Previous, action: 'previousTrack' }
-    ];
-
     it('Basic actions', () => {
-
+      const cases = [
+        { type: TYPE.Play, action: 'play' },
+        { type: TYPE.Pause, action: 'pause' },
+        { type: TYPE.Next, action: 'nextTrack' },
+        { type: TYPE.Previous, action: 'previousTrack' }
+      ];
       cases.forEach((test) => {
         // Need to reset this in the loop since we are testing multiple actions
         soap.invoke.reset();
-        console.log(test)
         expect(test.type, test.action).not.undefined;
         expect(player[test.action](), test.action).equal('promise');
         expect(soap.invoke.firstCall.args, test.action).eql([
           'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
           test.type
+        ]);
+      });
+    });
+
+    it('Volume', () => {
+      const cases = [
+        { type: TYPE.Volume, action: 'setVolume', value: 10, expectation: 10 },
+        { type: TYPE.Volume, action: 'setVolume', value: '+1', expectation: 21 },
+        { type: TYPE.Volume, action: 'setVolume', value: '-1', expectation: 19 }
+      ];
+      cases.forEach((test) => {
+        // Need to reset this in the loop since we are testing multiple actions
+        soap.invoke.reset();
+        player.state.volume = 20;
+        expect(test.type, test.action).not.undefined;
+        expect(player[test.action](test.value), test.action).equal('promise');
+        expect(soap.invoke.firstCall.args, test.action).eql([
+          'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
+          test.type,
+          { volume: test.expectation }
+        ]);
+      });
+    });
+
+    it('Mute', () => {
+      const cases = [
+        { type: TYPE.Mute, action: 'mute', expectation: 1 },
+        { type: TYPE.Mute, action: 'unMute', expectation: 0 }
+      ];
+      cases.forEach((test) => {
+        // Need to reset this in the loop since we are testing multiple actions
+        soap.invoke.reset();
+        expect(test.type, test.action).not.undefined;
+        expect(player[test.action](), test.action).equal('promise');
+        expect(soap.invoke.firstCall.args, test.action).eql([
+          'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
+          test.type,
+          { mute: test.expectation }
+        ]);
+      });
+    });
+
+    it('Seek', () => {
+      const cases = [
+        { type: TYPE.Seek, action: 'timeSeek', value: 120, expectation: { unit: 'REL_TIME', value: '00:02:00' } },
+        { type: TYPE.Seek, action: 'trackSeek', value: 12, expectation: { unit: 'TRACK_NR', value: 12 } }
+      ];
+      cases.forEach((test) => {
+        // Need to reset this in the loop since we are testing multiple actions
+        soap.invoke.reset();
+        expect(test.type, test.action).not.undefined;
+        expect(player[test.action](test.value), test.action).equal('promise');
+        expect(soap.invoke.firstCall.args, test.action).eql([
+          'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+          test.type,
+          test.expectation
         ]);
       });
     });
