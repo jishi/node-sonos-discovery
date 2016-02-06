@@ -12,9 +12,10 @@ describe('Player', () => {
   let Subscriber;
   let subscriber;
   let listener;
+  let soap;
 
   beforeEach(() => {
-    zoneMemberData =  {
+    zoneMemberData = {
       uuid: 'RINCON_00000000000001400',
       location: 'http://192.168.1.151:1400/xml/device_description.xml',
       zonename: 'Kitchen',
@@ -41,9 +42,14 @@ describe('Player', () => {
 
     Subscriber = sinon.stub().returns(subscriber);
 
+    soap = {
+      invoke: sinon.stub().returns('promise')
+    };
+
     Player = proxyquire('../../../lib/models/Player', {
       '../helpers/request': request,
-      '../Subscriber': Subscriber
+      '../Subscriber': Subscriber,
+      '../helpers/soap': soap
     });
 
     listener = {
@@ -121,4 +127,31 @@ describe('Player', () => {
 
     expect(player.state.volume).equals(12);
   });
+
+  context.only('Basic commands', () => {
+    let TYPE = require('../../../lib/helpers/soap').TYPE;
+
+    const cases = [
+      { type: TYPE.Play, action: 'play' },
+      { type: TYPE.Pause, action: 'pause' },
+      { type: TYPE.Next, action: 'nextTrack' },
+      { type: TYPE.Previous, action: 'previousTrack' }
+    ];
+
+    it('Basic actions', () => {
+
+      cases.forEach((test) => {
+        // Need to reset this in the loop since we are testing multiple actions
+        soap.invoke.reset();
+        console.log(test)
+        expect(test.type, test.action).not.undefined;
+        expect(player[test.action](), test.action).equal('promise');
+        expect(soap.invoke.firstCall.args, test.action).eql([
+          'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+          test.type
+        ]);
+      });
+    });
+  });
+
 });

@@ -16,4 +16,8 @@ describe.only('System test', () => {
   it('Has zones', () => {
     expect(system.zones).not.empty;
   });
+
+  it('Pauses', () => {
+    system.getPlayer('Office')
+  });
 });

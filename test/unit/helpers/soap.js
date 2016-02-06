@@ -3,6 +3,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 require('chai').use(require('sinon-chai'));
+/* jshint -W101 */
 
 describe('soap', () => {
   let request;
@@ -35,7 +36,29 @@ describe('soap', () => {
     expect(result).equal('promise');
   });
 
+  it('Supports calls without values', () => {
+    soap.invoke(
+      'http://127.0.0.1/test/path',
+      soap.TYPE.Play
+    );
+    expect(request).calledOnce;
+    expect(request.firstCall.args[0]).eql({
+      uri: 'http://127.0.0.1/test/path',
+      method: 'POST',
+      headers: {
+        'CONTENT-TYPE': 'text/xml; charset="utf-8"',
+        SOAPACTION: '"urn:schemas-upnp-org:service:AVTransport:1#Play"',
+        'CONTENT-LENGTH': 266
+      },
+      body: '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:Play xmlns:u="urn:schemas-upnp-org:service:AVTransport:1"><InstanceID>0</InstanceID><Speed>1</Speed></u:Play></s:Body></s:Envelope>'
+    });
+  });
+
   it('Contains templates', () => {
     expect(soap.TYPE).not.empty;
+    for (let key in soap.TYPE) {
+      let action = soap.TYPE[key];
+      expect(soap.TEMPLATES[action], key).not.undefined;
+    }
   });
 });
