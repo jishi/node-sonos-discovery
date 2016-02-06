@@ -16,8 +16,7 @@ describe('Make sure it finds players', () => {
     ssdp.stop();
   });
 
-  it('Finds players', function (done) {
-    this.timeout(5000);
+  it('Finds players', (done) => {
     let handler = sinon.spy((topology) => {
       console.log(topology);
       expect(topology.location).to.match(/^http:\/\/\d+\.\d+\.\d+\.\d+:1400/);

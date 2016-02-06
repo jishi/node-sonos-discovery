@@ -13,7 +13,9 @@ describe('request', () => {
 
   beforeEach(() => {
     client = {
-      on: sinon.spy()
+      on: sinon.spy(),
+      end: sinon.spy(),
+      write: sinon.spy()
     };
     http = {
       request: sinon.stub().returns(client)
@@ -30,42 +32,46 @@ describe('request', () => {
   });
 
   it('Transfers common arguments to http.request', () => {
-    let promise = request({
+    request({
       uri: 'http://127.0.0.1:1400/path',
-      method: 'SUBSCRIBE'
-    }).then(() => {
-      expect(http.request).calledOnce;
-      expect(http.request.firstCall.args[0]).eql({
-        method: 'SUBSCRIBE',
-        path: '/path',
-        host: '127.0.0.1',
-        port: 1400
-      });
+      method: 'SUBSCRIBE',
+      headers: {
+        'Content-Type': 'text/xml'
+      }
     });
 
-    http.request.yield(mockedStream);
-    mockedStream.push(null);
-
-    return promise;
+    expect(http.request).calledOnce;
+    expect(http.request.firstCall.args[0]).eql({
+      method: 'SUBSCRIBE',
+      path: '/path',
+      host: '127.0.0.1',
+      port: 1400,
+      headers: {
+        'Content-Type': 'text/xml'
+      }
+    });
   });
 
   it('Defaults to GET and port 80', () => {
-    let promise = request({
+    request({
       uri: 'http://127.0.0.1/path'
-    }).then(() => {
-      expect(http.request).calledOnce;
-      expect(http.request.firstCall.args[0]).eql({
-        method: 'GET',
-        path: '/path',
-        host: '127.0.0.1',
-        port: 80
-      });
     });
 
-    http.request.yield(mockedStream);
-    mockedStream.push(null);
+    expect(http.request).calledOnce;
+    expect(http.request.firstCall.args[0]).eql({
+      method: 'GET',
+      path: '/path',
+      host: '127.0.0.1',
+      port: 80
+    });
+  });
 
-    return promise;
+  it('Invokes end() to trigger the request', () => {
+    request({
+      uri: 'http://127.0.0.1/path'
+    });
+
+    expect(client.end).calledOnce;
   });
 
   it('Resolves promise if successful request', () => {
@@ -116,4 +122,32 @@ describe('request', () => {
 
     return promise;
   });
-});
+
+  it('Returns response object if stream=true', () => {
+    let promise = request({
+      uri: 'http://127.0.0.1/path',
+      stream: true
+    }).then((res) => {
+      expect(res).equal(mockedStream);
+    });
+
+    mockedStream.statusCode = 200;
+    mockedStream.statusMessage = 'OK';
+
+    http.request.yield(mockedStream);
+    mockedStream.push(null);
+
+    return promise;
+  });
+
+  it('Writes body if exists', () => {
+    request({
+      uri: 'http://127.0.0.1/path',
+      body: 'FOOBAR'
+    });
+
+    expect(client.write).calledOnce;
+    expect(client.write.firstCall.args[0]).equal('FOOBAR');
+  });
+})
+;

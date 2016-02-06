@@ -145,7 +145,6 @@ describe('NotificationListener', () => {
   it('Emits last-change for SUB rendering control last change event', (done) => {
     let listener = sinon.spy(function () {
       setImmediate(() => {
-        console.log(JSON.stringify(listener.firstCall.args[1]));
         expect(listener).calledOnce;
         expect(listener.firstCall.args[0]).equal('RINCON_12345678900001400');
         expect(listener.firstCall.args[1].subgain.val).equal('-3');

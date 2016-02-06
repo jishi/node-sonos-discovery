@@ -12,9 +12,10 @@ describe('Sub', () => {
   let Subscriber;
   let listener;
   let sub;
+  let soap;
 
   beforeEach(() => {
-    zoneMemberData =  {
+    zoneMemberData = {
       uuid: 'RINCON_10000000000001400',
       location: 'http://192.168.1.155:1400/xml/device_description.xml',
       zonename: 'TV Room',
@@ -48,8 +49,13 @@ describe('Sub', () => {
       on: sinon.spy()
     };
 
+    soap = {
+      invoke: sinon.stub().returns('promise')
+    };
+
     Sub = proxyquire('../../../lib/models/Sub', {
-      '../Subscriber': Subscriber
+      '../Subscriber': Subscriber,
+      '../helpers/soap': soap
     });
 
     sub = new Sub(zoneMemberData, listener);
@@ -83,5 +89,66 @@ describe('Sub', () => {
     expect(sub.crossover).equal(90);
     expect(sub.polarity).equal(0);
     expect(sub.enabled).equal(true);
+  });
+
+  context('EQ settings', () => {
+
+    const TYPE = require('../../../lib/helpers/soap').TYPE;
+
+    it('Can set gain', () => {
+      let result = sub.setGain(-2);
+      expect(soap.invoke).calledOnce;
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.155:1400/MediaRenderer/RenderingControl/Control',
+        TYPE.SetEQ,
+        { eqType: 'SubGain', value: -2 }
+      ]);
+
+      expect(result).equal('promise');
+    });
+
+    it('Can set crossover', () => {
+      let result = sub.setCrossover(100);
+      expect(soap.invoke).calledOnce;
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.155:1400/MediaRenderer/RenderingControl/Control',
+        TYPE.SetEQ,
+        { eqType: 'SubCrossover', value: 100 }
+      ]);
+      expect(result).equal('promise');
+    });
+    it('Can enable sub', () => {
+      let result = sub.enable();
+      expect(soap.invoke).calledOnce;
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.155:1400/MediaRenderer/RenderingControl/Control',
+        TYPE.SetEQ,
+        { eqType: 'SubEnabled', value: 1 }
+      ]);
+      expect(result).equal('promise');
+    });
+
+    it('Can disable sub', () => {
+      let result = sub.disable();
+      expect(soap.invoke).calledOnce;
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.155:1400/MediaRenderer/RenderingControl/Control',
+        TYPE.SetEQ,
+        { eqType: 'SubEnabled', value: 0 }
+      ]);
+      expect(result).equal('promise');
+    });
+
+    it('Can activate placement adjustment', () => {
+      let result = sub.placementAdjustment(true);
+      expect(soap.invoke).calledOnce;
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.155:1400/MediaRenderer/RenderingControl/Control',
+        TYPE.SetEQ,
+        { eqType: 'SubPolarity', value: 1 }
+      ]);
+      expect(result).equal('promise');
+    });
+
   });
 });

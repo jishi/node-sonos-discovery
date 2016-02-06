@@ -13,6 +13,7 @@ describe('SonosSystem', () => {
   let request;
   let NotificationListener;
   let listener;
+  let Subscriber;
 
   beforeEach(() => {
     ssdp = {
@@ -39,10 +40,13 @@ describe('SonosSystem', () => {
 
     NotificationListener = sinon.stub().returns(listener);
 
+    Subscriber = sinon.spy();
+
     SonosSystem = proxyquire('../../lib/SonosSystem', {
       './sonos-ssdp': ssdp,
       './helpers/request': request,
-      './NotificationListener': NotificationListener
+      './NotificationListener': NotificationListener,
+      './Subscriber': Subscriber
     });
 
     sonos = new SonosSystem();
@@ -68,7 +72,7 @@ describe('SonosSystem', () => {
 
     it('Finds local endpoint', () => {
       expect(request).called;
-      expect(request.firstCall.args[0].method).equals('HEAD');
+      expect(request.firstCall.args[0].method).equals('GET');
       expect(request.firstCall.args[0].uri).equals('http://127.0.0.1:1400/xml');
       expect(sonos.localEndpoint).equals('127.0.0.2');
     });
@@ -79,14 +83,20 @@ describe('SonosSystem', () => {
 
     it('Subscribes to player when ssdp emits', () => {
 
-      expect(request).calledTwice;
-      expect(request.secondCall.args[0].method).equals('SUBSCRIBE');
-      expect(request.secondCall.args[0].uri).equals('http://127.0.0.1:1400/ZoneGroupTopology/Event');
-      expect(request.secondCall.args[0].headers).eql({
-        NT: 'upnp:event',
-        CALLBACK: '<http://127.0.0.2:3500/>',
-        TIMEOUT: 'Second-600'
-      });
+      //expect(request).calledTwice;
+      //expect(request.secondCall.args[0].method).equals('SUBSCRIBE');
+      //expect(request.secondCall.args[0].uri).equals('http://127.0.0.1:1400/ZoneGroupTopology/Event');
+      //expect(request.secondCall.args[0].headers).eql({
+      //  NT: 'upnp:event',
+      //  CALLBACK: '<http://127.0.0.2:3500/>',
+      //  TIMEOUT: 'Second-600'
+      //});
+
+      expect(Subscriber).calledWithNew;
+      expect(Subscriber.firstCall.args).eql([
+        'http://127.0.0.1:1400/ZoneGroupTopology/Event',
+        'http://127.0.0.2:3500/'
+      ]);
 
     });
 
@@ -98,7 +108,7 @@ describe('SonosSystem', () => {
         expect(zone.members).not.empty;
         zone.members.forEach((member) => {
           expect(member).instanceOf(Player);
-        })
+        });
       });
     });
 
