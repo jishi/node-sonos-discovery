@@ -205,6 +205,70 @@ describe('Player', () => {
         ]);
       });
     });
-  });
 
+    it('clearQueue', () => {
+      expect(TYPE.RemoveAllTracksFromQueue).not.undefined;
+      expect(player.clearQueue()).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.RemoveAllTracksFromQueue
+      ]);
+    });
+
+    it('removeTrackFromQueue', () => {
+      expect(TYPE.RemoveTrackFromQueue).not.undefined;
+      expect(player.removeTrackFromQueue(13)).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.RemoveTrackFromQueue,
+        { track: 13 }
+      ]);
+    });
+
+    it('removeTrackFromQueue', () => {
+      expect(TYPE.RemoveTrackFromQueue).not.undefined;
+      expect(player.removeTrackFromQueue(13)).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.RemoveTrackFromQueue,
+        { track: 13 }
+      ]);
+    });
+
+    it('Repeat', () => {
+      expect(TYPE.SetPlayMode).not.undefined;
+      expect(player.repeat(true)).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.SetPlayMode,
+        { playMode: 'REPEAT' }
+      ]);
+
+      player.state.playMode.shuffle = true;
+      player.repeat(true);
+      expect(soap.invoke.secondCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.SetPlayMode,
+        { playMode: 'SHUFFLE' }
+      ]);
+    });
+
+    it.only('Shuffle', () => {
+      expect(TYPE.SetPlayMode).not.undefined;
+      expect(player.shuffle(true)).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.SetPlayMode,
+        { playMode: 'SHUFFLE_NOREPEAT' }
+      ]);
+
+      player.state.playMode.repeat = true;
+      player.shuffle(true);
+      expect(soap.invoke.secondCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.SetPlayMode,
+        { playMode: 'SHUFFLE' }
+      ]);
+    });
+  });
 });
