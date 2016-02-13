@@ -5,7 +5,7 @@ require('chai').use(require('sinon-chai'));
 
 const SonosSystem = require('../../lib/SonosSystem');
 
-describe('System test', () => {
+describe.only('System test', () => {
   let system;
 
   before((done) => {
@@ -32,11 +32,8 @@ describe('System test', () => {
       });
   });
 
-  it.only('Changes subGain', (done) => {
+  it('Changes subGain', () => {
     let player = system.getPlayer('TV Room');
-    player.sub.setGain(10)
-      .then(() => {
-        done();
-      });
+    return player.sub.setGain(10);
   });
 });

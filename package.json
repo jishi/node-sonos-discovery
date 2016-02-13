@@ -1,7 +1,7 @@
 {
-  "name": "sonos-discovery",
+  "name": "sonos-system",
   "version": "0.16.3",
-  "description": "A simple node module for finding players and controlling them",
+  "description": "A simple node library for managing your Sonos system",
   "author": "Jimmy Shimizu <jimmy@shimizu.se>",
   "repository": {
     "type": "git",
@@ -20,17 +20,16 @@
   },
   "devDependencies": {
     "chai": "*",
-    "jscs": "^2.8.0",
-    "jshint": "^2.9.1-rc2",
+    "jscs": "^2.9.0",
+    "jshint": "~2.8.0",
     "mocha": "*",
     "proxyquire": "^1.7.3",
-    "rewire": "^2.3.4",
     "sinon": "^1.17.2",
     "sinon-as-promised": "^4.0.0",
     "sinon-chai": "^2.8.0"
   },
   "engine": "node 4.x.x",
-  "main": "lib/sonos.js",
+  "main": "lib/SonosSystem.js",
   "scripts": {
     "jscs": "jscs lib",
     "mocha": "mocha test --recursive",

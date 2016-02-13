@@ -2,6 +2,7 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
+const fs = require('fs');
 require('chai').use(require('sinon-chai'));
 
 describe('Player', () => {
@@ -13,6 +14,8 @@ describe('Player', () => {
   let subscriber;
   let listener;
   let soap;
+
+  let TYPE = require('../../../lib/helpers/soap').TYPE;
 
   beforeEach(() => {
     zoneMemberData = {
@@ -90,10 +93,11 @@ describe('Player', () => {
   });
 
   it('Updates state when last change event occur', () => {
+    soap.invoke.resolves();
     let lastChange = require('../../data/avtransportlastchange.json');
     listener.on.yield('RINCON_00000000000001400', lastChange);
 
-    expect(player.state.currentState).equals('PLAYING');
+    expect(player.state.playbackState).equals('PLAYING');
     expect(player.state.trackNo).equals(43);
     expect(player.state.currentTrack).eql({
       artist: 'Johannes Brahms',
@@ -129,8 +133,6 @@ describe('Player', () => {
   });
 
   context('Basic commands', () => {
-    let TYPE = require('../../../lib/helpers/soap').TYPE;
-
     it('Basic actions', () => {
       const cases = [
         { type: TYPE.Play, action: 'play' },
@@ -153,13 +155,12 @@ describe('Player', () => {
     it('Volume', () => {
       const cases = [
         { type: TYPE.Volume, action: 'setVolume', value: 10, expectation: 10 },
-        { type: TYPE.Volume, action: 'setVolume', value: '+1', expectation: 21 },
-        { type: TYPE.Volume, action: 'setVolume', value: '-1', expectation: 19 }
+        { type: TYPE.Volume, action: 'setVolume', value: '+1', expectation: 11 },
+        { type: TYPE.Volume, action: 'setVolume', value: '-1', expectation: 10 }
       ];
       cases.forEach((test) => {
         // Need to reset this in the loop since we are testing multiple actions
         soap.invoke.reset();
-        player.state.volume = 20;
         expect(test.type, test.action).not.undefined;
         expect(player[test.action](test.value), test.action).equal('promise');
         expect(soap.invoke.firstCall.args, test.action).eql([
@@ -241,7 +242,7 @@ describe('Player', () => {
       expect(soap.invoke.firstCall.args).eql([
         'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
         TYPE.SetPlayMode,
-        { playMode: 'REPEAT' }
+        { playMode: 'REPEAT_ALL' }
       ]);
 
       player.state.playMode.shuffle = true;
@@ -271,7 +272,7 @@ describe('Player', () => {
       ]);
     });
 
-    it.only('Crossfade', () => {
+    it('Crossfade', () => {
       expect(TYPE.SetCrossfadeMode).not.undefined;
       expect(player.crossfade(true)).equal('promise');
       expect(soap.invoke.firstCall.args).eql([
@@ -285,6 +286,90 @@ describe('Player', () => {
         TYPE.SetCrossfadeMode,
         { crossfadeMode: 0 }
       ]);
+    });
+
+    it('Sleep', () => {
+      expect(TYPE.ConfigureSleepTimer).not.undefined;
+      expect(player.sleep(120)).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.ConfigureSleepTimer,
+        { time: '00:02:00' }
+      ]);
+    });
+
+    it.only('setAVTransport', () => {
+      expect(TYPE.SetAVTransportURI).not.undefined;
+      expect(player.setAVTransport('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.SetAVTransportURI,
+        {
+          uri: 'x-rincon:RINCON_00000000000001400',
+          metadata: '&lt;DIDL-Lite&gt;&lt;/DIDL-Lite&gt;'
+        }
+      ]);
+    });
+  });
+
+  context('Position of track progress should be fetched', () => {
+
+    it('GetPositionInfo is requested', () => {
+      soap.invoke.resolves();
+      let lastChange = require('../../data/avtransportlastchange.json');
+      listener.on.yield('RINCON_00000000000001400', lastChange);
+
+      expect(TYPE.GetPositionInfo).not.undefined;
+      expect(soap.invoke).calledOnce;
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.GetPositionInfo
+      ]);
+    });
+
+    context('Using fake timers', () => {
+      let clock;
+      let now;
+
+      beforeEach(() => {
+        now = Date.now();
+        clock = sinon.useFakeTimers(now);
+      });
+
+      afterEach(() => {
+        clock.restore();
+      });
+
+      it('GetPositionInfo is saved', (done) => {
+        let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
+        positionXml.statusCode = 200;
+        soap.invoke.resolves(positionXml);
+        let lastChange = require('../../data/avtransportlastchange.json');
+        listener.on.yield('RINCON_00000000000001400', lastChange);
+
+        clock.restore();
+        setTimeout(() => {
+          expect(player.state.elapsedTime).equal(142);
+          done();
+        }, 20);
+      });
+
+      it('elapsedTime is dynamically calculated', (done) => {
+        let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
+        positionXml.statusCode = 200;
+        soap.invoke.resolves(positionXml);
+        let lastChange = require('../../data/avtransportlastchange.json');
+        listener.on.yield('RINCON_00000000000001400', lastChange);
+
+        clock.restore();
+
+        // This is a really hacky solution to test multiple promise chains
+        setTimeout(() => {
+          clock = sinon.useFakeTimers(now + 6000);
+          expect(player.state.elapsedTime).equal(147);
+          done();
+        }, 50);
+      });
     });
   });
 });
