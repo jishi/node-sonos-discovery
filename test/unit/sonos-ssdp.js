@@ -43,7 +43,7 @@ describe('Sonos-SSDP', function () {
     // Trigger the listening event callback
     socket.bind.yield();
     expect(socket.send).calledOnce;
-    expect(socket.send.firstCall.args[0]).contains('M-SEARCH');
+    expect(socket.send.firstCall.args[0].toString()).contains('M-SEARCH');
     expect(socket.send.firstCall.args[3]).equals(1900);
     expect(socket.send.firstCall.args[4]).equals('239.255.255.250');
   });
