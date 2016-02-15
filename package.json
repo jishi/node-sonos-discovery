@@ -32,7 +32,7 @@
   "main": "lib/SonosSystem.js",
   "scripts": {
     "jscs": "jscs lib",
-    "mocha": "mocha test --recursive",
+    "mocha": "mocha test/unit --recursive",
     "test": "npm run -s jscs && npm run -s mocha"
   }
 }
