@@ -298,7 +298,7 @@ describe('Player', () => {
       ]);
     });
 
-    it.only('setAVTransport', () => {
+    it('setAVTransport', () => {
       expect(TYPE.SetAVTransportURI).not.undefined;
       expect(player.setAVTransport('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')).equal('promise');
       expect(soap.invoke.firstCall.args).eql([
