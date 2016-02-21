@@ -15,7 +15,8 @@ describe('request', () => {
     client = {
       on: sinon.spy(),
       end: sinon.spy(),
-      write: sinon.spy()
+      write: sinon.spy(),
+      setTimeout: sinon.spy()
     };
     http = {
       request: sinon.stub().returns(client)
@@ -50,6 +51,26 @@ describe('request', () => {
         'Content-Type': 'text/xml'
       }
     });
+  });
+
+  it('Sets timeout on client object', () => {
+    request({
+      uri: 'http://127.0.0.1:1400/path',
+      timeout: 10
+    });
+
+    expect(client.setTimeout).calledOnce;
+    expect(client.setTimeout.firstCall.args[0]).equal(10);
+
+  });
+
+  it('does not call setTimeout if no timeout', () => {
+    request({
+      uri: 'http://127.0.0.1:1400/path'
+    });
+
+    expect(client.setTimeout).not.called;
+
   });
 
   it('Defaults to GET and port 80', () => {
@@ -123,6 +144,20 @@ describe('request', () => {
     return promise;
   });
 
+  it('Rejects if timeout occur', () => {
+    let promise = request({
+      uri: 'http://127.0.0.1/path'
+    }).then(() => {
+      expect().fail();
+    }).catch((e) => {
+      expect(e).instanceOf(Error);
+    });
+
+    client.on.withArgs('timeout').yield(new Error());
+
+    return promise;
+  });
+
   it('Returns response object if stream=true', () => {
     let promise = request({
       uri: 'http://127.0.0.1/path',
@@ -149,5 +184,5 @@ describe('request', () => {
     expect(client.write).calledOnce;
     expect(client.write.firstCall.args[0]).equal('FOOBAR');
   });
-})
-;
+
+});

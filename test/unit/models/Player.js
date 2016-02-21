@@ -3,6 +3,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 const fs = require('fs');
+const path = require('path');
 require('chai').use(require('sinon-chai'));
 
 describe('Player', () => {
@@ -132,7 +133,7 @@ describe('Player', () => {
     expect(player.state.volume).equals(12);
   });
 
-  context('Basic commands', () => {
+  context('commands', () => {
     it('Basic actions', () => {
       const cases = [
         { type: TYPE.Play, action: 'play' },
@@ -310,6 +311,20 @@ describe('Player', () => {
         }
       ]);
     });
+
+    it('browse', () => {
+      expect(TYPE.Browse).not.undefined;
+      expect(player.browse('FV:2', 0, 100)).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
+        TYPE.Browse,
+        {
+          objectId: 'FV:2',
+          startIndex: 0,
+          limit: 100
+        }
+      ]);
+    });
   });
 
   context('Position of track progress should be fetched', () => {
@@ -369,6 +384,41 @@ describe('Player', () => {
           expect(player.state.elapsedTime).equal(147);
           done();
         }, 50);
+      });
+    });
+  });
+
+  context('Browse-inherited functions', () => {
+    describe('Return queue', () => {
+      let queue;
+      beforeEach(() => {
+        let queueStream = fs.createReadStream(path.join(__dirname, '../data/queue.xml'));
+
+        soap.invoke.returns(Promise.resolve(queueStream));
+
+        return player.getQueue()
+          .then((q) => {
+            queue = q;
+          });
+      });
+
+      it('Should have invoked browse', () => {
+        expect(soap.invoke).calledOnce;
+        expect(soap.invoke.firstCall.args[2]).eql({
+          objectId: 'Q:0',
+          startIndex: 0,
+          limit: 0
+        });
+      });
+
+      xit('Parses queue and returns a list of well designed objects', () => {
+        expect(queue.items).not.empty;
+        expect(queue[0]).eql({
+          startIndex: 0,
+          numberReturned: 49,
+          totalMatches: 49,
+          items: []
+        });
       });
     });
   });
