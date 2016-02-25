@@ -311,20 +311,6 @@ describe('Player', () => {
         }
       ]);
     });
-
-    it('browse', () => {
-      expect(TYPE.Browse).not.undefined;
-      expect(player.browse('FV:2', 0, 100)).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
-        TYPE.Browse,
-        {
-          objectId: 'FV:2',
-          startIndex: 0,
-          limit: 100
-        }
-      ]);
-    });
   });
 
   context('Position of track progress should be fetched', () => {
@@ -392,7 +378,7 @@ describe('Player', () => {
     describe('Return queue', () => {
       let queue;
       beforeEach(() => {
-        let queueStream = fs.createReadStream(path.join(__dirname, '../data/queue.xml'));
+        let queueStream = fs.createReadStream(path.join(__dirname, '../../data/queue.xml'));
 
         soap.invoke.returns(Promise.resolve(queueStream));
 
@@ -411,13 +397,17 @@ describe('Player', () => {
         });
       });
 
-      xit('Parses queue and returns a list of well designed objects', () => {
+      it('Parses queue and returns a list of well designed objects', () => {
         expect(queue.items).not.empty;
-        expect(queue[0]).eql({
-          startIndex: 0,
-          numberReturned: 49,
-          totalMatches: 49,
-          items: []
+        expect(queue.startIndex).equal(0);
+        expect(queue.numberReturned).equal(49);
+        expect(queue.totalMatches).equal(49);
+        expect(queue.items[0]).eql({
+          uri: 'x-sonos-spotify:spotify%3atrack%3a2uAWmcvujYUNTPCIb2VYKH?sid=9&flags=8224&sn=2',
+          artist: 'Deftones',
+          title: 'Prayers/Triangles',
+          album: 'Prayers/Triangles',
+          albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a2uAWmcvujYUNTPCIb2VYKH%3fsid%3d9%26flags%3d8224%26sn%3d2'
         });
       });
     });
