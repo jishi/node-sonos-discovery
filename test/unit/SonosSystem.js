@@ -5,7 +5,7 @@ const proxyquire = require('proxyquire');
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
 
-describe('SonosSystem', () => {
+context.only('SonosSystem', () => {
   let SonosSystem;
   let ssdp;
   let sonos;
@@ -67,7 +67,7 @@ describe('SonosSystem', () => {
     expect(ssdp.start).calledOnce;
   });
 
-  context('topology done', () => {
+  describe('when topology is done', () => {
 
     beforeEach((done) => {
       ssdp.on.yield({
@@ -93,16 +93,6 @@ describe('SonosSystem', () => {
     });
 
     it('Subscribes to player when ssdp emits', () => {
-
-      //expect(request).calledTwice;
-      //expect(request.secondCall.args[0].method).equals('SUBSCRIBE');
-      //expect(request.secondCall.args[0].uri).equals('http://127.0.0.1:1400/ZoneGroupTopology/Event');
-      //expect(request.secondCall.args[0].headers).eql({
-      //  NT: 'upnp:event',
-      //  CALLBACK: '<http://127.0.0.2:3500/>',
-      //  TIMEOUT: 'Second-600'
-      //});
-
       expect(Subscriber).calledWithNew;
       expect(Subscriber.firstCall.args).eql([
         'http://127.0.0.1:1400/ZoneGroupTopology/Event',
@@ -166,6 +156,14 @@ describe('SonosSystem', () => {
             expect(player.coordinator.uuid).equal(coordinatorUuid);
           });
         });
+      });
+    });
+  });
+  
+  describe('When applying a preset', () => {
+    beforeEach(() => {
+      return sonos.applyPreset({
+
       });
     });
   });

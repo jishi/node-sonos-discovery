@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 require('chai').use(require('sinon-chai'));
 
-describe('Player', () => {
+context('Player', () => {
   let zoneMemberData;
   let request;
   let Player;
