@@ -1,11 +1,11 @@
 'use strict';
 const expect = require('chai').expect;
 const sinon = require('sinon');
-const proxyquire = require('proxyquire');
+const proxyquire = require('proxyquire').noCallThru();
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
 
-context.only('SonosSystem', () => {
+context('SonosSystem', () => {
   let SonosSystem;
   let ssdp;
   let sonos;
@@ -159,12 +159,25 @@ context.only('SonosSystem', () => {
       });
     });
   });
-  
-  describe('When applying a preset', () => {
-    beforeEach(() => {
-      return sonos.applyPreset({
+});
 
+context('SonosSystem presets', () => {
+
+
+
+  describe('When applying a preset', () => {
+    before(() => {
+      return sonos.applyPreset({
+        test: {
+          players: [{ roomName: 'Bedroom' }, { roomName: 'Kitchen' }, { roomName: 'Office', volume: 15 }],
+          playMode: 'NORMAL'
+        }
       });
     });
+
+    it('Has invoked ', () => {
+
+    });
   });
+
 });
