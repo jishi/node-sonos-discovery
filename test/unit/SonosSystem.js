@@ -160,24 +160,3 @@ context('SonosSystem', () => {
     });
   });
 });
-
-context('SonosSystem presets', () => {
-
-
-
-  describe('When applying a preset', () => {
-    before(() => {
-      return sonos.applyPreset({
-        test: {
-          players: [{ roomName: 'Bedroom' }, { roomName: 'Kitchen' }, { roomName: 'Office', volume: 15 }],
-          playMode: 'NORMAL'
-        }
-      });
-    });
-
-    it('Has invoked ', () => {
-
-    });
-  });
-
-});
