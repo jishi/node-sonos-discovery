@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jishi/node-sonos-discovery.svg?branch=refactor-with-promises)](https://travis-ci.org/jishi/node-sonos-discovery)
+
 node-sonos-discovery
 --------------------
 
