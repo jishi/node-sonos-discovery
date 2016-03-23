@@ -34,7 +34,7 @@ describe('Subscriber', () => {
 
   it('Resubscribes if failure', function (done) {
     request.rejects('Rejecting subscribe attempt. This is a mocked error');
-    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600, 100);
+    let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600, 100);
 
     setTimeout(() => {
 
@@ -48,6 +48,7 @@ describe('Subscriber', () => {
           TIMEOUT: 'Second-600'
         }
       });
+      subscriber.dispose();
       done();
     }, 150);
   });
@@ -56,7 +57,7 @@ describe('Subscriber', () => {
     request.resolves({
       SID: '1234567890'
     });
-    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
+    let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
 
     setTimeout(() => {
       expect(request).calledTwice;
@@ -70,6 +71,7 @@ describe('Subscriber', () => {
           SID: '1234567890'
         }
       });
+      subscriber.dispose();
       done();
     }, 90);
   });
