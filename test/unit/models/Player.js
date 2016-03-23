@@ -311,6 +311,15 @@ context('Player', () => {
         }
       ]);
     });
+
+    it('becomeCoordinatorOfStandaloneGroup', () => {
+      expect(TYPE.BecomeCoordinatorOfStandaloneGroup).not.undefined;
+      expect(player.becomeCoordinatorOfStandaloneGroup()).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.BecomeCoordinatorOfStandaloneGroup
+      ]);
+    });
   });
 
   context('Position of track progress should be fetched', () => {

@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "chai": "*",
+    "jscs": "^2.11.0",
     "jshint": "~2.8.0",
     "mocha": "*",
     "proxyquire": "^1.7.3",
@@ -28,6 +29,6 @@
   "scripts": {
     "jscs": "jscs lib",
     "mocha": "mocha test/unit --recursive",
-    "test": "npm run -s mocha"
+    "test": "npm run -s jscs && npm run -s mocha"
   }
 }
