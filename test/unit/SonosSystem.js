@@ -63,6 +63,11 @@ context('SonosSystem', () => {
     sonos = new SonosSystem();
   });
 
+  it('Loaded prototypes', () => {
+    expect(SonosSystem).respondTo('applyPreset');
+    expect(SonosSystem).respondTo('replaceWithFavorite');
+  });
+
   it('Starts scanning', () => {
     expect(ssdp.start).calledOnce;
   });

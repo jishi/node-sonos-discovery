@@ -10,9 +10,11 @@ context('SonosSystem.applyPreset', () => {
     let system;
     let player;
     let preset;
+    let superfluousPlayer;
 
     before(() => {
       player = {
+        roomName: 'Kitchen',
         setVolume: sinon.stub().resolves(),
         pause: sinon.stub().resolves(),
         setAVTransport: sinon.stub().resolves(),
@@ -26,10 +28,18 @@ context('SonosSystem.applyPreset', () => {
 
       player.coordinator = player;
 
+      superfluousPlayer = {
+        becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves()
+      };
+
       system = {
         getPlayer: sinon.stub().returns(player),
         zones: [
-          { uuid: 'RINCON_0000000001400', coordinator: player },
+          {
+            uuid: 'RINCON_0000000001400', coordinator: player, members: [
+            player, player, player, superfluousPlayer
+          ]
+          },
           { coordinator: player }
         ]
       };
@@ -81,6 +91,10 @@ context('SonosSystem.applyPreset', () => {
       expect(player.setAVTransport).calledTwice;
       expect(player.setAVTransport.firstCall.args[0]).equal('x-rincon:RINCON_0000000001400');
       expect(player.setAVTransport.secondCall.args[0]).equal('x-rincon:RINCON_0000000001400');
+    });
+
+    it('Ungroups players that does\'nt belong to group', () => {
+      expect(superfluousPlayer.becomeCoordinatorOfStandaloneGroup).calledOnce;
     });
 
     it('Replaces queue with favorite', () => {
@@ -149,6 +163,42 @@ context('SonosSystem.applyPreset', () => {
 
     it('Detaches first player from group', () => {
       expect(coordinator.becomeCoordinatorOfStandaloneGroup).calledOnce;
+    });
+  });
+
+  describe('When preset contains uri only', () => {
+    let system;
+    let player;
+    let preset;
+    let coordinator;
+
+    before(() => {
+      player = {
+        setAVTransport: sinon.stub().resolves(),
+        becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
+        uuid: 'RINCON_0000000001400'
+      };
+
+      system = {
+        getPlayer: sinon.stub().returns(player),
+        zones: [
+          { uuid: 'RINCON_0000000001400', coordinator: player }
+        ]
+      };
+
+      preset = {
+        test: {
+          players: [{ roomName: 'Bedroom' }],
+          uri: 'x-rincon-stream:UUID_0000000001400'
+        }
+      };
+
+      return applyPreset.call(system, preset.test);
+    });
+
+    it('Sets uri to preset uri', () => {
+      expect(player.setAVTransport).calledOnce;
+      expect(player.setAVTransport.firstCall.args[0]).equal(preset.test.uri);
     });
   });
 });
