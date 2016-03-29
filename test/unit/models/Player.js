@@ -133,6 +133,10 @@ context('Player', () => {
     expect(player.state.volume).equals(12);
   });
 
+  it('Loads prototypes', () => {
+    expect(player).respondsTo('replaceWithFavorite');
+  });
+
   context('commands', () => {
     it('Basic actions', () => {
       const cases = [
@@ -214,16 +218,6 @@ context('Player', () => {
       expect(soap.invoke.firstCall.args).eql([
         'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
         TYPE.RemoveAllTracksFromQueue
-      ]);
-    });
-
-    it('removeTrackFromQueue', () => {
-      expect(TYPE.RemoveTrackFromQueue).not.undefined;
-      expect(player.removeTrackFromQueue(13)).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.RemoveTrackFromQueue,
-        { track: 13 }
       ]);
     });
 

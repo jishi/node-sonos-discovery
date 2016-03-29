@@ -65,7 +65,8 @@ context('SonosSystem', () => {
 
   it('Loaded prototypes', () => {
     expect(SonosSystem).respondTo('applyPreset');
-    expect(SonosSystem).respondTo('replaceWithFavorite');
+    expect(SonosSystem).respondTo('getFavorites');
+    expect(SonosSystem).respondTo('getPlaylists');
   });
 
   it('Starts scanning', () => {

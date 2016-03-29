@@ -4,7 +4,7 @@ const sinon = require('sinon');
 require('chai').use(require('sinon-chai'));
 
 context('SonosSystem.applyPreset', () => {
-  const applyPreset = require('../../../lib/prototypes/SonosSystem.applyPreset.js');
+  const applyPreset = require('../../../../lib/prototypes/SonosSystem/applyPreset.js');
 
   describe('When applying a preset', () => {
     let system;
