@@ -67,6 +67,7 @@ context('SonosSystem', () => {
     expect(SonosSystem).respondTo('applyPreset');
     expect(SonosSystem).respondTo('getFavorites');
     expect(SonosSystem).respondTo('getPlaylists');
+    expect(SonosSystem).respondTo('refreshShareIndex');
   });
 
   it('Starts scanning', () => {
@@ -162,6 +163,18 @@ context('SonosSystem', () => {
             expect(player.coordinator.uuid).equal(coordinatorUuid);
           });
         });
+      });
+
+      it('Returns player with getPlayer', () => {
+        let player = sonos.getPlayer('Office');
+        expect(player).instanceOf(Player);
+        expect(player.roomName).equals('Office');
+      });
+
+      it('Returns player with getPlayerByUUD', () => {
+        let player = sonos.getPlayerByUUID('RINCON_20000000000001400');
+        expect(player).instanceOf(Player);
+        expect(player.roomName).equals('TV Room');
       });
     });
   });

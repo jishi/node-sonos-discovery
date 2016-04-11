@@ -314,6 +314,15 @@ context('Player', () => {
         TYPE.BecomeCoordinatorOfStandaloneGroup
       ]);
     });
+
+    it('refreshShareIndex', () => {
+      expect(TYPE.RefreshShareIndex).not.undefined;
+      expect(player.refreshShareIndex()).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
+        TYPE.RefreshShareIndex
+      ]);
+    });
   });
 
   context('Position of track progress should be fetched', () => {
