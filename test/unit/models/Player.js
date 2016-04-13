@@ -62,6 +62,7 @@ context('Player', () => {
     };
 
     player = new Player(zoneMemberData, listener);
+    player.coordinator = player;
 
   });
 
