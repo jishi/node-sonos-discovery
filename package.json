@@ -27,7 +27,7 @@
   "engine": "node 4.x.x",
   "main": "lib/SonosSystem.js",
   "scripts": {
-    "jscs": "jscs lib",
+    "jscs": "jscs lib test",
     "mocha": "mocha test/unit --recursive",
     "test": "npm run -s jscs && npm run -s mocha"
   }

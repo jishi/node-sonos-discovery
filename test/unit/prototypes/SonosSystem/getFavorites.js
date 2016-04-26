@@ -15,8 +15,6 @@ context('getFavorites', () => {
 
   describe('When calling getFavorites', () => {
     before(() => {
-
-
       player = {
         browse: sinon.stub().resolves(resultMock)
       };

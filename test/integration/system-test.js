@@ -14,7 +14,7 @@ describe.only('System test', () => {
   });
 
   after(() => {
-   //system.dispose();
+    //system.dispose();
   });
 
   it('Has zones', () => {

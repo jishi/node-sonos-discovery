@@ -15,6 +15,7 @@ context('Player', () => {
   let subscriber;
   let listener;
   let soap;
+  let system;
 
   let TYPE = require('../../../lib/helpers/soap').TYPE;
 
@@ -61,8 +62,19 @@ context('Player', () => {
       on: sinon.spy()
     };
 
-    player = new Player(zoneMemberData, listener);
+    system = {
+      zones: [
+        {
+          uuid: zoneMemberData.uuid,
+          members: []
+        }
+      ]
+    };
+
+    player = new Player(zoneMemberData, listener, system);
     player.coordinator = player;
+    system.zones[0].coordinator = player;
+    system.zones[0].members.push(player);
 
   });
 
@@ -132,6 +144,7 @@ context('Player', () => {
     listener.on.yield('RINCON_00000000000001400', lastChange);
 
     expect(player.state.volume).equals(12);
+    expect(player.groupState.volume).equals(12);
   });
 
   it('Loads prototypes', () => {
