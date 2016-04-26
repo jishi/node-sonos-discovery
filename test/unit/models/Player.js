@@ -320,6 +320,19 @@ context('Player', () => {
       ]);
     });
 
+    it('setAVTransport without metadata', () => {
+      expect(TYPE.SetAVTransportURI).not.undefined;
+      expect(player.setAVTransport('x-rincon:RINCON_00000000000001400')).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.SetAVTransportURI,
+        {
+          uri: 'x-rincon:RINCON_00000000000001400',
+          metadata: ''
+        }
+      ]);
+    });
+
     it('becomeCoordinatorOfStandaloneGroup', () => {
       expect(TYPE.BecomeCoordinatorOfStandaloneGroup).not.undefined;
       expect(player.becomeCoordinatorOfStandaloneGroup()).equal('promise');
@@ -434,6 +447,37 @@ context('Player', () => {
           title: 'Prayers/Triangles',
           album: 'Prayers/Triangles',
           albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a2uAWmcvujYUNTPCIb2VYKH%3fsid%3d9%26flags%3d8224%26sn%3d2'
+        });
+      });
+    });
+
+    describe('Parsing playlists', () => {
+      let queue;
+      beforeEach(() => {
+        let queueStream = fs.createReadStream(path.join(__dirname, '../../data/playlists.xml'));
+
+        soap.invoke.returns(Promise.resolve(queueStream));
+
+        return player.browse()
+          .then((q) => {
+            queue = q;
+          });
+      });
+
+      it('Parses response and returns a list of well designed objects', () => {
+        expect(queue.items).not.empty;
+        expect(queue.startIndex).equal(0);
+        expect(queue.numberReturned).equal(2);
+        expect(queue.totalMatches).equal(2);
+        expect(queue.items[0]).eql({
+          uri: 'file:///jffs/settings/savedqueues.rsq#2',
+          title: 'Morgon',
+          albumArtUri: [
+            '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a35N1AduT1LDo3deLfYniTY%3fsid%3d9%26flags%3d0',
+            '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a1MQYow43CGLYMECVSjTpCM%3fsid%3d9%26flags%3d0',
+            '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a4QWMYALvB1m4Um8ytjZR9m%3fsid%3d9%26flags%3d0',
+            '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a1d62ECx2DlaBmhOLymrVGc%3fsid%3d9%26flags%3d0'
+          ]
         });
       });
     });
