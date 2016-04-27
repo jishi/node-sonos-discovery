@@ -350,6 +350,21 @@ context('Player', () => {
         TYPE.RefreshShareIndex
       ]);
     });
+
+    it('addURIToQueue', () => {
+      expect(TYPE.AddURIToQueue).not.undefined;
+      expect(player.addURIToQueue('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')).equal('promise');
+      expect(soap.invoke.firstCall.args).eql([
+        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+        TYPE.AddURIToQueue,
+        {
+          uri: 'x-rincon:RINCON_00000000000001400',
+          metadata: '&lt;DIDL-Lite&gt;&lt;/DIDL-Lite&gt;',
+          enqueueAsNext: 0,
+          desiredFirstTrackNumberEnqueued: 0
+        }
+      ]);
+    });
   });
 
   context('Position of track progress should be fetched', () => {

@@ -8,7 +8,7 @@ context('getFavorites', () => {
 
   let player;
   let system;
-  let resultMock = [{}];
+  let resultMock = { items: [], startIndex: 0 };
   let success;
 
   const getFavorites = require('../../../../lib/prototypes/SonosSystem/getFavorites.js');
@@ -35,7 +35,7 @@ context('getFavorites', () => {
     });
 
     it('Returns the expected result', () => {
-      expect(success.firstCall.args[0]).equal(resultMock);
+      expect(success.firstCall.args[0]).equal(resultMock.items);
     });
   });
 });
