@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 require('chai').use(require('sinon-chai'));
 
-context('Player', () => {
+describe('Player', () => {
   let zoneMemberData;
   let request;
   let Player;
@@ -459,6 +459,7 @@ context('Player', () => {
         expect(queue.items[0]).eql({
           uri: 'x-sonos-spotify:spotify%3atrack%3a2uAWmcvujYUNTPCIb2VYKH?sid=9&flags=8224&sn=2',
           artist: 'Deftones',
+          metadata: undefined,
           title: 'Prayers/Triangles',
           album: 'Prayers/Triangles',
           albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a2uAWmcvujYUNTPCIb2VYKH%3fsid%3d9%26flags%3d8224%26sn%3d2'

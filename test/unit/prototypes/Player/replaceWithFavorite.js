@@ -62,7 +62,7 @@ context('Player.replaceWithFavorite', () => {
 
     it('Sets the avtransport to current queue', () => {
       expect(player.setAVTransport).calledOnce;
-      expect(player.setAVTransport.firstCall.args[0]).equal(`x-rincon:${player.uuid}#0`);
+      expect(player.setAVTransport.firstCall.args[0]).equal(`x-rincon-queue:${player.uuid}#0`);
     });
 
     it('Starts playback', () => {
