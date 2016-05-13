@@ -3,7 +3,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 require('chai').use(require('sinon-chai'));
 
-context('Player.replaceWithFavorite', () => {
+describe('Player.replaceWithFavorite', () => {
   const replaceWithFavorite = require('../../../../lib/prototypes/Player/replaceWithFavorite.js');
 
   describe('When replacing with streaming favorite', () => {
@@ -81,7 +81,7 @@ context('Player.replaceWithFavorite', () => {
           title: 'Metropol 93,8',
           uri: 'x-sonosapi-stream:s20308?sid=254&flags=32',
           albumArtURI: 'http://d1i6vahw24eb07.cloudfront.net/s20308q.gif',
-          metaData: '<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"><item id="F00090020s20308" parentID="F00020064search%3astation:Metropol" restricted="true"><dc:title>Metropol 93,8</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">SA_RINCON65031_</desc></item></DIDL-Lite>'
+          metadata: '<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"><item id="F00090020s20308" parentID="F00020064search%3astation:Metropol" restricted="true"><dc:title>Metropol 93,8</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">SA_RINCON65031_</desc></item></DIDL-Lite>'
         }
       ];
 
@@ -113,6 +113,7 @@ context('Player.replaceWithFavorite', () => {
     it('Sets the avtransport to uri directly', () => {
       expect(player.setAVTransport).calledOnce;
       expect(player.setAVTransport.firstCall.args[0]).equal(favorites[0].uri);
+      expect(player.setAVTransport.firstCall.args[1]).equal(favorites[0].metadata);
     });
 
     it('Starts playback', () => {

@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 require('chai').use(require('sinon-chai'));
 
-context('Player.calculateGroupVolume', () => {
+describe('Player.calculateGroupVolume', () => {
   const recalculateGroupVolume = require('../../../../lib/prototypes/Player/recalculateGroupVolume.js');
   let players;
   let coordinator;

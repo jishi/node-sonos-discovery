@@ -91,7 +91,7 @@ describe('Sub', () => {
     expect(sub.enabled).equal(true);
   });
 
-  context('EQ settings', () => {
+  describe('EQ settings', () => {
 
     const TYPE = require('../../../lib/helpers/soap').TYPE;
 

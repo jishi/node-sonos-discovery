@@ -3,7 +3,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 require('chai').use(require('sinon-chai'));
 
-context('SonosSystem.applyPreset', () => {
+describe('SonosSystem.applyPreset', () => {
   const applyPreset = require('../../../../lib/prototypes/SonosSystem/applyPreset.js');
 
   describe('When applying a preset', () => {
@@ -15,11 +15,14 @@ context('SonosSystem.applyPreset', () => {
     before(() => {
       player = {
         roomName: 'Kitchen',
+        play: sinon.stub().resolves(),
         setVolume: sinon.stub().resolves(),
         pause: sinon.stub().resolves(),
         setAVTransport: sinon.stub().resolves(),
         replaceWithFavorite: sinon.stub().resolves(),
-        setPlayMode: sinon.stub().resolves(),
+        repeat: sinon.stub().resolves(),
+        shuffle: sinon.stub().resolves(),
+        crossfade: sinon.stub().resolves(),
         trackSeek: sinon.stub().resolves(),
         timeSeek: sinon.stub().resolves(),
         becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
@@ -103,8 +106,12 @@ context('SonosSystem.applyPreset', () => {
     });
 
     it('Sets correct playmode', () => {
-      expect(player.setPlayMode).calledOnce;
-      expect(player.setPlayMode.firstCall.args[0]).eql(preset.test.playMode);
+      expect(player.repeat).calledOnce;
+      expect(player.repeat.firstCall.args[0]).eql(preset.test.playMode.repeat);
+      expect(player.shuffle).calledOnce;
+      expect(player.shuffle.firstCall.args[0]).eql(preset.test.playMode.shuffle);
+      expect(player.crossfade).calledOnce;
+      expect(player.crossfade.firstCall.args[0]).eql(preset.test.playMode.crossfade);
     });
 
     it('Skips to correct track', () => {
@@ -115,6 +122,10 @@ context('SonosSystem.applyPreset', () => {
     it('Skips to correct time', () => {
       expect(player.timeSeek).calledOnce;
       expect(player.timeSeek.firstCall.args[0]).equal(preset.test.elapsedTime);
+    });
+
+    it('Should start playback', () => {
+      expect(player.play).calledOnce;
     });
 
   });
@@ -133,6 +144,7 @@ context('SonosSystem.applyPreset', () => {
       };
 
       coordinator = {
+        play: sinon.stub().resolves(),
         setVolume: sinon.stub().resolves(),
         becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
         uuid: 'RINCON_10000000001400',
@@ -174,6 +186,7 @@ context('SonosSystem.applyPreset', () => {
 
     before(() => {
       player = {
+        play: sinon.stub().resolves(),
         setAVTransport: sinon.stub().resolves(),
         becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
         uuid: 'RINCON_0000000001400'

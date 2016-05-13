@@ -5,7 +5,7 @@ const proxyquire = require('proxyquire').noCallThru();
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
 
-context('SonosSystem', () => {
+describe('SonosSystem', () => {
   let SonosSystem;
   let ssdp;
   let sonos;
@@ -108,7 +108,7 @@ context('SonosSystem', () => {
 
     });
 
-    context('topology', () => {
+    describe('topology', () => {
 
       beforeEach(() => {
         let topology = require('../data/topology.json');

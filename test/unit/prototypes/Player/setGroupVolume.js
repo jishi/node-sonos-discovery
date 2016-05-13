@@ -3,7 +3,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 require('chai').use(require('sinon-chai'));
 
-context('Player.setGroupVolume', () => {
+describe('Player.setGroupVolume', () => {
   const setGroupVolume = require('../../../../lib/prototypes/Player/setGroupVolume.js');
   let players;
   let coordinator;

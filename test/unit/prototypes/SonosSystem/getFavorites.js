@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 require('chai').use(require('sinon-chai'));
 
-context('getFavorites', () => {
+describe('getFavorites', () => {
 
   let player;
   let system;

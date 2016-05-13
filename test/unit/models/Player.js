@@ -151,7 +151,7 @@ describe('Player', () => {
     expect(player).respondsTo('replaceWithFavorite');
   });
 
-  context('commands', () => {
+  describe('commands', () => {
     it('Basic actions', () => {
       const cases = [
         { type: TYPE.Play, action: 'play' },
@@ -367,7 +367,7 @@ describe('Player', () => {
     });
   });
 
-  context('Position of track progress should be fetched', () => {
+  describe('Position of track progress should be fetched', () => {
 
     it('GetPositionInfo is requested', () => {
       soap.invoke.resolves();
@@ -382,7 +382,7 @@ describe('Player', () => {
       ]);
     });
 
-    context('Using fake timers', () => {
+    describe('Using fake timers', () => {
       let clock;
       let now;
 
@@ -428,7 +428,7 @@ describe('Player', () => {
     });
   });
 
-  context('Browse-inherited functions', () => {
+  describe('Browse-inherited functions', () => {
     describe('Return queue', () => {
       let queue;
       beforeEach(() => {
