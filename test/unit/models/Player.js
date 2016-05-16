@@ -106,36 +106,39 @@ describe('Player', () => {
     expect(listener.on).calledOnce;
   });
 
-  it('Updates state when last change event occur', () => {
+  it('Updates state when last change event occur', (done) => {
     soap.invoke.resolves();
     let lastChange = require('../../data/avtransportlastchange.json');
     listener.on.yield('RINCON_00000000000001400', lastChange);
 
-    expect(player.state.playbackState).equals('PLAYING');
-    expect(player.state.trackNo).equals(43);
-    expect(player.state.currentTrack).eql({
-      artist: 'Johannes Brahms',
-      title: 'Intermezzo No. 3 in C-sharp minor, Op. 117 - Andante con moto',
-      album: 'Glenn Gould plays Brahms: 4 Ballades op. 10; 2 Rhapsodies op. 79; 10 Intermezzi',
-      albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a5qAFqkXoQd2RfjZ2j1ay0w%3fsid%3d9%26flags%3d8224%26sn%3d9',
-      duration: 318,
-      uri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
-      radioShowMetaData: ''
-    });
+    setImmediate(() => {
+      expect(player.state.playbackState).equals('PLAYING');
+      expect(player.state.trackNo).equals(43);
+      expect(player.state.currentTrack).eql({
+        artist: 'Johannes Brahms',
+        title: 'Intermezzo No. 3 in C-sharp minor, Op. 117 - Andante con moto',
+        album: 'Glenn Gould plays Brahms: 4 Ballades op. 10; 2 Rhapsodies op. 79; 10 Intermezzi',
+        albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a5qAFqkXoQd2RfjZ2j1ay0w%3fsid%3d9%26flags%3d8224%26sn%3d9',
+        duration: 318,
+        uri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
+        radioShowMetaData: ''
+      });
 
-    expect(player.state.nextTrack).eql({
-      artist: 'Coheed and Cambria',
-      title: 'Here To Mars',
-      album: 'The Color Before The Sun',
-      albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a0Ap3aOVU7LItcHIFiRF8lY%3fsid%3d9%26flags%3d8224%26sn%3d9',
-      duration: 241,
-      uri: 'x-sonos-spotify:spotify%3atrack%3a0Ap3aOVU7LItcHIFiRF8lY?sid=9&flags=8224&sn=9'
-    });
+      expect(player.state.nextTrack).eql({
+        artist: 'Coheed and Cambria',
+        title: 'Here To Mars',
+        album: 'The Color Before The Sun',
+        albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a0Ap3aOVU7LItcHIFiRF8lY%3fsid%3d9%26flags%3d8224%26sn%3d9',
+        duration: 241,
+        uri: 'x-sonos-spotify:spotify%3atrack%3a0Ap3aOVU7LItcHIFiRF8lY?sid=9&flags=8224&sn=9'
+      });
 
-    expect(player.state.playMode).eql({
-      repeat: true,
-      shuffle: true,
-      crossfade: true
+      expect(player.state.playMode).eql({
+        repeat: true,
+        shuffle: true,
+        crossfade: true
+      });
+      done();
     });
   });
 
