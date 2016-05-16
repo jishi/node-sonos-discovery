@@ -11,6 +11,7 @@ describe('SonosSystem.applyPreset', () => {
     let player;
     let preset;
     let superfluousPlayer;
+    let otherPlayer;
 
     before(() => {
       player = {
@@ -29,6 +30,12 @@ describe('SonosSystem.applyPreset', () => {
         uuid: 'RINCON_0000000001400'
       };
 
+      otherPlayer = {
+        roomName: 'Other room',
+        pause: sinon.stub().resolves(),
+        uuid: 'RINCON_1000000001400'
+      };
+
       player.coordinator = player;
 
       superfluousPlayer = {
@@ -39,11 +46,13 @@ describe('SonosSystem.applyPreset', () => {
         getPlayer: sinon.stub().returns(player),
         zones: [
           {
-            uuid: 'RINCON_0000000001400', coordinator: player, members: [
-            player, player, player, superfluousPlayer
-          ]
+            uuid: 'RINCON_0000000001400',
+            coordinator: player,
+            members: [
+              player, player, player, superfluousPlayer
+            ]
           },
-          { coordinator: player }
+          { coordinator: otherPlayer }
         ]
       };
 
@@ -69,7 +78,7 @@ describe('SonosSystem.applyPreset', () => {
     });
 
     it('Pauses all zones', () => {
-      expect(player.pause).calledTwice;
+      expect(otherPlayer.pause).calledOnce;
     });
 
     it('Has invoked getPlayer thrice', () => {
