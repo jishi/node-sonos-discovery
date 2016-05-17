@@ -171,6 +171,12 @@ describe('SonosSystem', () => {
         expect(player.roomName).equals('Office');
       });
 
+      it('Returns player with getPlayer case insensitive', () => {
+        let player = sonos.getPlayer('officE');
+        expect(player).instanceOf(Player);
+        expect(player.roomName).equals('Office');
+      });
+
       it('Returns player with getPlayerByUUD', () => {
         let player = sonos.getPlayerByUUID('RINCON_20000000000001400');
         expect(player).instanceOf(Player);
