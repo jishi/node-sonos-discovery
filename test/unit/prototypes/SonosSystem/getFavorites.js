@@ -43,9 +43,7 @@ describe('getFavorites', () => {
     });
 
     it('Returns the expected result with undefined values filtered out', () => {
-      expect(success.firstCall.args[0]).eql([
-        resultMock.items[0]
-      ]);
+      expect(success.firstCall.args[0]).eql(resultMock.items);
     });
   });
 });
