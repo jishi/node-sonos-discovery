@@ -8,7 +8,15 @@ describe('getFavorites', () => {
 
   let player;
   let system;
-  let resultMock = { items: [], startIndex: 0 };
+  let resultMock = {
+    items: [{
+      uri: 'test://uri',
+      title: 'title'
+    }, {
+      uri: undefined,
+      title: undefined
+    }], startIndex: 0
+  };
   let success;
 
   const getFavorites = require('../../../../lib/prototypes/SonosSystem/getFavorites.js');
@@ -34,8 +42,10 @@ describe('getFavorites', () => {
       expect(player.browse.firstCall.args).eql(['FV:2', 0, 0]);
     });
 
-    it('Returns the expected result', () => {
-      expect(success.firstCall.args[0]).equal(resultMock.items);
+    it('Returns the expected result with undefined values filtered out', () => {
+      expect(success.firstCall.args[0]).eql([
+        resultMock.items[0]
+      ]);
     });
   });
 });
