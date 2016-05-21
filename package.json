@@ -10,7 +10,6 @@
   "dependencies": {
     "html-entities": "1.0.x",
     "request-promise": "^1.0.2",
-    "require-fu": "^1.0.0",
     "xml-flow": "^1.0.1"
   },
   "devDependencies": {
