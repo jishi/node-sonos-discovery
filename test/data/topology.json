@@ -2,7 +2,7 @@
   {
     "$name": "zonegroup",
     "$attrs": {
-      "coordinator": "RINCON_00000000000001400 ",
+      "coordinator": "RINCON_00000000000001400",
       "id": "RINCON_00000000000001400:0"
     },
     "zonegroupmember": {

@@ -77,7 +77,8 @@ describe('Player', () => {
           uuid: zoneMemberData.uuid,
           members: []
         }
-      ]
+      ],
+      on: sinon.stub()
     };
 
     player = new Player(zoneMemberData, listener, system);
@@ -99,27 +100,26 @@ describe('Player', () => {
     expect(player.baseUrl).equal('http://192.168.1.151:1400');
   });
 
-  it('Subscribes to the various notifications', () => {
-    expect(Subscriber).callCount(3);
-    expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/AVTransport/Event', 'http://127.0.0.2/')).calledOnce;
+  it('Subscribes to the various notifications by default', () => {
+    expect(Subscriber).callCount(2);
     expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/RenderingControl/Event', 'http://127.0.0.2/')).calledOnce;
     expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/GroupRenderingControl/Event', 'http://127.0.0.2/')).calledOnce;
   });
 
   it('Invokes dispose on all listeners when disposing player', () => {
     player.dispose();
-    expect(subscriber.dispose).callCount(3);
+    expect(subscriber.dispose).callCount(2);
   });
 
   it('Subscribes to listener events', () => {
-    expect(listener.on).calledOnce;
+    expect(listener.on).calledTwice;
   });
 
   describe('When it recieves a transport-state update', () => {
     beforeEach((done) => {
       soap.invoke.resolves();
       let lastChange = require('../../data/avtransportlastchange.json');
-      listener.on.yield('RINCON_00000000000001400', lastChange);
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       player.on('transport-state', () => {
         done();
       });
@@ -156,9 +156,31 @@ describe('Player', () => {
     });
   });
 
+  describe('When topology event occurs', () => {
+    it('Subscribes to AVTransport if coordinator', () => {
+      const topology = require('../../data/topology.json');
+      player.uuid = 'RINCON_00000000000301400';
+      listener.on.withArgs('topology').yield('', topology);
+
+      expect(Subscriber).callCount(3);
+      expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/AVTransport/Event', 'http://127.0.0.2/')).calledOnce;
+    });
+
+    it('Unsubscribes from AVTransport if no longer coordinator', () => {
+      const topology = require('../../data/topology.json');
+      player.uuid = 'RINCON_00000000000301400';
+      listener.on.withArgs('topology').yield('', topology);
+
+      player.uuid = 'RINCON_0000000000101400';
+      listener.on.withArgs('topology').yield('', topology);
+
+      expect(subscriber.dispose).calledOnce;
+    });
+  });
+
   it('Updates volume when notification occurs', () => {
     let lastChange = require('../../data/renderingControlLastChange.json');
-    listener.on.yield('RINCON_00000000000001400', lastChange);
+    listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
 
     expect(player.state.volume).equals(12);
     expect(player.groupState.volume).equals(12);
@@ -391,7 +413,7 @@ describe('Player', () => {
         done();
       });
       let lastChange = require('../../data/avtransportlastchange.json');
-      listener.on.yield('RINCON_00000000000001400', lastChange);
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
     });
 
     it('GetPositionInfo is requested', () => {
@@ -414,7 +436,7 @@ describe('Player', () => {
       positionXml.statusCode = 200;
       soap.invoke.resolves(positionXml);
       let lastChange = require('../../data/avtransportlastchange.json');
-      listener.on.yield('RINCON_00000000000001400', lastChange);
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       player.on('transport-state', () => {
         done();
       });
@@ -438,7 +460,7 @@ describe('Player', () => {
       positionXml.statusCode = 200;
       soap.invoke.resolves(positionXml);
       let lastChange = require('../../data/avtransportlastchange.json');
-      listener.on.yield('RINCON_00000000000001400', lastChange);
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       clock.tick(6000);
       expect(player.state.elapsedTime).equal(148);
     });

@@ -82,7 +82,7 @@ describe('Sub', () => {
     expect(subscriber.dispose).calledOnce;
   });
 
-  it('Updates properties when event occurs', () => {
+  it.skip('Updates properties when event occurs', () => {
     let lastChange = require('../../data/sublastchange.json');
     listener.on.yield('RINCON_10000000000001400', lastChange);
     expect(sub.gain).equal(-3);

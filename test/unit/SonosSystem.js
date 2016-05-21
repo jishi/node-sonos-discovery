@@ -123,6 +123,8 @@ describe('SonosSystem', () => {
             expect(member).instanceOf(Player);
           });
         });
+
+        expect(sonos.zones[0].id).equal('RINCON_00000000000301400:66');
       });
 
       it('Populate players on topology notification', () => {
