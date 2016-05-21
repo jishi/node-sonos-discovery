@@ -55,6 +55,45 @@ describe('Subscriber', () => {
     }, 150);
   });
 
+  it('Resubscribes without sid if resubscribe fails', function (done) {
+    request.onCall(0).resolves({
+      headers: {
+        sid: '12345678'
+      }
+    });
+    request.rejects('Rejecting subscribe attempt. This is a mocked error');
+    let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1, 100);
+
+    setTimeout(() => {
+
+      expect(request).callCount(3);
+      expect(request.secondCall.args[0]).eql({
+        uri: 'http://192.168.1.151:1400/test/path',
+        method: 'SUBSCRIBE',
+        stream: true,
+        headers: {
+          CALLBACK: '<http://127.0.0.2/>',
+          NT: 'upnp:event',
+          TIMEOUT: 'Second-0.1',
+          SID: '12345678'
+        }
+      });
+
+      expect(request.thirdCall.args[0]).eql({
+        uri: 'http://192.168.1.151:1400/test/path',
+        method: 'SUBSCRIBE',
+        stream: true,
+        headers: {
+          CALLBACK: '<http://127.0.0.2/>',
+          NT: 'upnp:event',
+          TIMEOUT: 'Second-0.1'
+        }
+      });
+      subscriber.dispose();
+      done();
+    }, 250);
+  });
+
   it('Resubscribes right before timeout', (done) => {
     request.resolves({
       headers: {
