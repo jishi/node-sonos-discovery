@@ -10,7 +10,7 @@ describe('soap', () => {
   let soap;
 
   beforeEach(() => {
-    request = sinon.stub().returns('promise');
+    request = sinon.stub().resolves();
 
     soap = proxyquire('../../../lib/helpers/soap', {
       './request': request
@@ -34,7 +34,7 @@ describe('soap', () => {
       body: '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:SetEQ xmlns:u="urn:schemas-upnp-org:service:RenderingControl:1"><InstanceID>0</InstanceID><EQType>SubGain</EQType><DesiredValue>-2</DesiredValue></u:SetEQ></s:Body></s:Envelope>',
       stream: true
     });
-    expect(result).equal('promise');
+    expect(result).instanceOf(Promise);
   });
 
   it('Supports calls without values', () => {

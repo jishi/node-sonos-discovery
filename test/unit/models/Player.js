@@ -16,6 +16,7 @@ describe('Player', () => {
   let listener;
   let soap;
   let system;
+  let musicServices;
 
   let TYPE = require('../../../lib/helpers/soap').TYPE;
 
@@ -51,10 +52,18 @@ describe('Player', () => {
       invoke: sinon.stub().returns('promise')
     };
 
+    musicServices = {
+      tryGetHighResArt: sinon.stub()
+    };
+
+    musicServices.tryGetHighResArt.onCall(0).resolves('http://example.org/image1');
+    musicServices.tryGetHighResArt.onCall(1).resolves('http://example.org/image2');
+
     Player = proxyquire('../../../lib/models/Player', {
       '../helpers/request': request,
       '../Subscriber': Subscriber,
-      '../helpers/soap': soap
+      '../helpers/soap': soap,
+      '../musicservices': musicServices
     });
 
     listener = {
@@ -106,12 +115,17 @@ describe('Player', () => {
     expect(listener.on).calledOnce;
   });
 
-  it('Updates state when last change event occur', (done) => {
-    soap.invoke.resolves();
-    let lastChange = require('../../data/avtransportlastchange.json');
-    listener.on.yield('RINCON_00000000000001400', lastChange);
+  describe('When it receies a transport-state update', () => {
+    beforeEach((done) => {
+      soap.invoke.resolves();
+      let lastChange = require('../../data/avtransportlastchange.json');
+      listener.on.yield('RINCON_00000000000001400', lastChange);
+      player.on('transport-state', () => {
+        done();
+      });
+    });
 
-    setImmediate(() => {
+    it('Updates state', () => {
       expect(player.state.playbackState).equals('PLAYING');
       expect(player.state.trackNo).equals(43);
       expect(player.state.currentTrack).eql({
@@ -119,16 +133,17 @@ describe('Player', () => {
         title: 'Intermezzo No. 3 in C-sharp minor, Op. 117 - Andante con moto',
         album: 'Glenn Gould plays Brahms: 4 Ballades op. 10; 2 Rhapsodies op. 79; 10 Intermezzi',
         albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a5qAFqkXoQd2RfjZ2j1ay0w%3fsid%3d9%26flags%3d8224%26sn%3d9',
+        absoluteAlbumArtUri: 'http://example.org/image1',
         duration: 318,
         uri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
         radioShowMetaData: ''
       });
-
       expect(player.state.nextTrack).eql({
         artist: 'Coheed and Cambria',
         title: 'Here To Mars',
         album: 'The Color Before The Sun',
         albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a0Ap3aOVU7LItcHIFiRF8lY%3fsid%3d9%26flags%3d8224%26sn%3d9',
+        absoluteAlbumArtUri: 'http://example.org/image2',
         duration: 241,
         uri: 'x-sonos-spotify:spotify%3atrack%3a0Ap3aOVU7LItcHIFiRF8lY?sid=9&flags=8224&sn=9'
       });
@@ -138,7 +153,6 @@ describe('Player', () => {
         shuffle: true,
         crossfade: true
       });
-      done();
     });
   });
 
@@ -371,11 +385,16 @@ describe('Player', () => {
   });
 
   describe('Position of track progress should be fetched', () => {
-
-    it('GetPositionInfo is requested', () => {
+    beforeEach((done) => {
       soap.invoke.resolves();
+      player.on('transport-state', () => {
+        done();
+      });
       let lastChange = require('../../data/avtransportlastchange.json');
       listener.on.yield('RINCON_00000000000001400', lastChange);
+    });
+
+    it('GetPositionInfo is requested', () => {
 
       expect(TYPE.GetPositionInfo).not.undefined;
       expect(soap.invoke).calledOnce;
@@ -384,50 +403,46 @@ describe('Player', () => {
         TYPE.GetPositionInfo
       ]);
     });
+  });
 
-    describe('Using fake timers', () => {
-      let clock;
-      let now;
+  describe('Using fake timers', () => {
+    let clock;
+    let now;
 
-      beforeEach(() => {
-        now = Date.now();
-        clock = sinon.useFakeTimers(now);
+    beforeEach((done) => {
+      let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
+      positionXml.statusCode = 200;
+      soap.invoke.resolves(positionXml);
+      let lastChange = require('../../data/avtransportlastchange.json');
+      listener.on.yield('RINCON_00000000000001400', lastChange);
+      player.on('transport-state', (state) => {
+        done();
       });
+    });
 
-      afterEach(() => {
-        clock.restore();
-      });
+    beforeEach(() => {
+      now = Date.now();
+      clock = sinon.useFakeTimers(now);
+    });
 
-      it('GetPositionInfo is saved', (done) => {
-        let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
-        positionXml.statusCode = 200;
-        soap.invoke.resolves(positionXml);
-        let lastChange = require('../../data/avtransportlastchange.json');
-        listener.on.yield('RINCON_00000000000001400', lastChange);
+    afterEach(() => {
+      clock.restore();
+    });
 
-        clock.restore();
-        setTimeout(() => {
-          expect(player.state.elapsedTime).equal(142);
-          done();
-        }, 20);
-      });
+    it('GetPositionInfo is saved', () => {
+      expect(player.state.elapsedTime).equal(142);
+    });
 
-      it('elapsedTime is dynamically calculated', (done) => {
-        let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
-        positionXml.statusCode = 200;
-        soap.invoke.resolves(positionXml);
-        let lastChange = require('../../data/avtransportlastchange.json');
-        listener.on.yield('RINCON_00000000000001400', lastChange);
+    it('elapsedTime is dynamically calculated', () => {
+      let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
+      positionXml.statusCode = 200;
+      soap.invoke.resolves(positionXml);
+      let lastChange = require('../../data/avtransportlastchange.json');
+      listener.on.yield('RINCON_00000000000001400', lastChange);
 
-        clock.restore();
-
-        // This is a really hacky solution to test multiple promise chains
-        setTimeout(() => {
-          clock = sinon.useFakeTimers(now + 6000);
-          expect(player.state.elapsedTime).equal(147);
-          done();
-        }, 50);
-      });
+      clock.restore();
+      clock = sinon.useFakeTimers(now + 6000);
+      expect(player.state.elapsedTime).equal(148);
     });
   });
 
@@ -501,4 +516,5 @@ describe('Player', () => {
       });
     });
   });
-});
+})
+;
