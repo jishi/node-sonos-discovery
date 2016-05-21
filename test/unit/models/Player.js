@@ -101,18 +101,19 @@ describe('Player', () => {
   });
 
   it('Subscribes to the various notifications by default', () => {
-    expect(Subscriber).callCount(2);
+    expect(Subscriber).callCount(3);
+    expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/AVTransport/Event', 'http://127.0.0.2/')).calledOnce;
     expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/RenderingControl/Event', 'http://127.0.0.2/')).calledOnce;
     expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/GroupRenderingControl/Event', 'http://127.0.0.2/')).calledOnce;
   });
 
   it('Invokes dispose on all listeners when disposing player', () => {
     player.dispose();
-    expect(subscriber.dispose).callCount(2);
+    expect(subscriber.dispose).callCount(3);
   });
 
   it('Subscribes to listener events', () => {
-    expect(listener.on).calledTwice;
+    expect(listener.on).calledOnce;
   });
 
   describe('When it recieves a transport-state update', () => {
@@ -153,28 +154,6 @@ describe('Player', () => {
         shuffle: true,
         crossfade: true
       });
-    });
-  });
-
-  describe('When topology event occurs', () => {
-    it('Subscribes to AVTransport if coordinator', () => {
-      const topology = require('../../data/topology.json');
-      player.uuid = 'RINCON_00000000000301400';
-      listener.on.withArgs('topology').yield('', topology);
-
-      expect(Subscriber).callCount(3);
-      expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/AVTransport/Event', 'http://127.0.0.2/')).calledOnce;
-    });
-
-    it('Unsubscribes from AVTransport if no longer coordinator', () => {
-      const topology = require('../../data/topology.json');
-      player.uuid = 'RINCON_00000000000301400';
-      listener.on.withArgs('topology').yield('', topology);
-
-      player.uuid = 'RINCON_0000000000101400';
-      listener.on.withArgs('topology').yield('', topology);
-
-      expect(subscriber.dispose).calledOnce;
     });
   });
 
