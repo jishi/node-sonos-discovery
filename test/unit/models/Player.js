@@ -115,7 +115,7 @@ describe('Player', () => {
     expect(listener.on).calledOnce;
   });
 
-  describe('When it receies a transport-state update', () => {
+  describe('When it recieves a transport-state update', () => {
     beforeEach((done) => {
       soap.invoke.resolves();
       let lastChange = require('../../data/avtransportlastchange.json');
@@ -415,7 +415,7 @@ describe('Player', () => {
       soap.invoke.resolves(positionXml);
       let lastChange = require('../../data/avtransportlastchange.json');
       listener.on.yield('RINCON_00000000000001400', lastChange);
-      player.on('transport-state', (state) => {
+      player.on('transport-state', () => {
         done();
       });
     });
@@ -439,9 +439,7 @@ describe('Player', () => {
       soap.invoke.resolves(positionXml);
       let lastChange = require('../../data/avtransportlastchange.json');
       listener.on.yield('RINCON_00000000000001400', lastChange);
-
-      clock.restore();
-      clock = sinon.useFakeTimers(now + 6000);
+      clock.tick(6000);
       expect(player.state.elapsedTime).equal(148);
     });
   });
