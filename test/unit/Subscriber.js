@@ -28,7 +28,8 @@ describe('Subscriber', () => {
         CALLBACK: '<http://127.0.0.2/>',
         NT: 'upnp:event',
         TIMEOUT: 'Second-600'
-      }
+      },
+      stream: true
     });
   });
 
@@ -42,6 +43,7 @@ describe('Subscriber', () => {
       expect(request.secondCall.args[0]).eql({
         uri: 'http://192.168.1.151:1400/test/path',
         method: 'SUBSCRIBE',
+        stream: true,
         headers: {
           CALLBACK: '<http://127.0.0.2/>',
           NT: 'upnp:event',
@@ -55,7 +57,9 @@ describe('Subscriber', () => {
 
   it('Resubscribes right before timeout', (done) => {
     request.resolves({
-      SID: '1234567890'
+      headers: {
+        sid: '1234567890'
+      }
     });
     let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
 
@@ -64,6 +68,7 @@ describe('Subscriber', () => {
       expect(request.secondCall.args[0]).eql({
         uri: 'http://192.168.1.151:1400/test/path',
         method: 'SUBSCRIBE',
+        stream: true,
         headers: {
           CALLBACK: '<http://127.0.0.2/>',
           NT: 'upnp:event',
@@ -78,7 +83,9 @@ describe('Subscriber', () => {
 
   it('Stops renewing if dispose is called', (done) => {
     request.resolves({
-      SID: '1234567890'
+      headers: {
+        sid: '1234567890'
+      }
     });
     let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
 
