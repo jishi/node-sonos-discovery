@@ -16,5 +16,8 @@
       "channel": "RF",
       "val": "100"
     }
-  ]
+  ],
+  "outputfixed": {
+    "val": "0"
+  }
 }

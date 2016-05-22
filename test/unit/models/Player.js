@@ -157,12 +157,27 @@ describe('Player', () => {
     });
   });
 
-  it('Updates volume when notification occurs', () => {
-    let lastChange = require('../../data/renderingControlLastChange.json');
-    listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+  describe('when volume event occurs', () => {
+    it('Updates volume', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
 
-    expect(player.state.volume).equals(12);
-    expect(player.groupState.volume).equals(12);
+      expect(player.state.volume).equals(12);
+      expect(player.groupState.volume).equals(12);
+    });
+
+    it('outputFixed is false', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.outputFixed).equals(false);
+    });
+
+    it('outputFixed is true', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      lastChange.outputfixed.val = '1';
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.outputFixed).equals(true);
+    });
   });
 
   it('Loads prototypes', () => {
@@ -206,6 +221,14 @@ describe('Player', () => {
           { volume: test.expectation }
         ]);
       });
+    });
+
+    it('Volume with fixedoutput should short circuit', () => {
+      player.outputFixed = true;
+      return player.setVolume(10)
+        .then(() => {
+          expect(soap.invoke).not.called;
+        });
     });
 
     it('Mute', () => {

@@ -11,6 +11,7 @@ describe('NotificationListener', () => {
   let http;
   let server;
   let mockedStream;
+  let res;
 
   beforeEach(() => {
     server = {
@@ -23,6 +24,11 @@ describe('NotificationListener', () => {
     let NotificationListener = proxyquire('../../lib/NotificationListener', {
       http
     });
+
+    res = {
+      end: sinon.spy(),
+      writeHead: sinon.spy()
+    };
 
     notificationListener = new NotificationListener();
 
@@ -65,7 +71,7 @@ describe('NotificationListener', () => {
     xmlStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'
     };
-    http.createServer.yield(xmlStream);
+    http.createServer.yield(xmlStream, res);
 
   });
 
@@ -84,7 +90,7 @@ describe('NotificationListener', () => {
     xmlStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'
     };
-    http.createServer.yield(xmlStream);
+    http.createServer.yield(xmlStream, res);
   });
 
   it('Emits last-change on RenderingControl LastChange', (done) => {
@@ -107,7 +113,7 @@ describe('NotificationListener', () => {
     xmlStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'
     };
-    http.createServer.yield(xmlStream);
+    http.createServer.yield(xmlStream, res);
   });
 
   it('Emits queue-change', (done) => {
@@ -123,7 +129,7 @@ describe('NotificationListener', () => {
     xmlStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'
     };
-    http.createServer.yield(xmlStream);
+    http.createServer.yield(xmlStream, res);
   });
 
   it('Emits favorite-change', (done) => {
@@ -139,7 +145,7 @@ describe('NotificationListener', () => {
     xmlStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'
     };
-    http.createServer.yield(xmlStream);
+    http.createServer.yield(xmlStream, res);
   });
 
   it('Emits last-change for SUB rendering control last change event', (done) => {
@@ -161,6 +167,6 @@ describe('NotificationListener', () => {
     xmlStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'
     };
-    http.createServer.yield(xmlStream);
+    http.createServer.yield(xmlStream, res);
   });
 });
