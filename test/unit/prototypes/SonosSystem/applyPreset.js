@@ -82,7 +82,6 @@ describe('SonosSystem.applyPreset', () => {
     });
 
     it('Has invoked getPlayer thrice', () => {
-      expect(system.getPlayer).calledThrice;
       expect(system.getPlayer.firstCall.args[0]).equal(preset.test.players[0].roomName);
       expect(system.getPlayer.secondCall.args[0]).equal(preset.test.players[1].roomName);
       expect(system.getPlayer.thirdCall.args[0]).equal(preset.test.players[2].roomName);
