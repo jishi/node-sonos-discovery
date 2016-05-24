@@ -70,7 +70,8 @@ describe('SonosSystem.applyPreset', () => {
           pauseOthers: true,
           favorite: 'My favorite',
           trackNo: 12,
-          elapsedTime: 120
+          elapsedTime: 120,
+          state: 'playing'
         }
       };
 
