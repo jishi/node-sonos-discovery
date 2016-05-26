@@ -8,6 +8,7 @@ describe('Sonos-SSDP', function () {
   let ssdp;
   let dgram;
   let socket;
+  let os;
 
   beforeEach(() => {
     socket = {
@@ -20,8 +21,19 @@ describe('Sonos-SSDP', function () {
     dgram = {
       createSocket: sinon.stub().returns(socket)
     };
+    os = {
+      networkInterfaces: sinon.stub().returns({
+        eth0: [{
+          internal: false,
+          family: 'IPv4',
+          address: '10.0.0.1'
+        }]
+      })
+    };
+
     ssdp = proxyquire('../../lib/sonos-ssdp', {
-      dgram
+      dgram,
+      os
     });
   });
 
@@ -31,6 +43,7 @@ describe('Sonos-SSDP', function () {
     expect(dgram.createSocket).calledOnce;
     expect(socket.bind).calledOnce;
     expect(socket.bind.firstCall.args[0]).equals(1905);
+    expect(socket.bind.firstCall.args[1]).equals('0.0.0.0');
 
     // trigger the callback on bind
     socket.bind.yield();
@@ -56,6 +69,17 @@ describe('Sonos-SSDP', function () {
       expect(socket.send).calledTwice;
       done();
     }, 1500);
+  });
+
+  it('Switches interface if more than 5 seconds elapse', function (done) {
+    this.timeout(10000);
+    ssdp.start();
+    socket.bind.yield();
+    setTimeout(() => {
+      expect(socket.bind).calledTwice;
+      expect(socket.bind.secondCall.args[1]).equals('10.0.0.1');
+      done();
+    }, 5500);
   });
 
   it('Emits upon successful resolve', () => {
