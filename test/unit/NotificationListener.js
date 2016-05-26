@@ -66,7 +66,7 @@ describe('NotificationListener', () => {
     });
 
     notificationListener.on('topology', listener);
-    let xmlStream = fs.createReadStream(__dirname + '/../data/zonegroupstate.xml');
+    let xmlStream = fs.createReadStream(__dirname + '/../data/zonegroupstate_with_satellites.xml');
     xmlStream.method = 'NOTIFY';
     xmlStream.headers = {
       sid: 'uuid:RINCON_12345678900001400_sub'

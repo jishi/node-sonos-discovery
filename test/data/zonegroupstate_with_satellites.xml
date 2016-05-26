@@ -1,0 +1,79 @@
+<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">
+    <e:property>
+        <ZoneGroupState>&lt;ZoneGroups&gt;
+            &lt;ZoneGroup Coordinator=&quot;RINCON_00000000000001400
+            &quot; ID=&quot;RINCON_00000000000001400:0&quot;&gt;
+            &lt;ZoneGroupMember UUID=&quot;RINCON_00000000000001400&quot; Location=&quot;http://192.168.1.150:1400/xml/device_description.xml&quot; ZoneName=&quot;BOOST&quot; Icon=&quot;x-rincon-roomicon:viper&quot; Configuration=&quot;1&quot; Invisible=&quot;1&quot; IsZoneBridge=&quot;1&quot; SoftwareVersion=&quot;31.8-24090&quot; MinCompatibleVersion=&quot;29.0-00000&quot; LegacyCompatibleVersion=&quot;24.0-00000&quot; BootSeq=&quot;43&quot; WirelessMode=&quot;0&quot; HasConfiguredSSID=&quot;0&quot; ChannelFreq=&quot;2412&quot; BehindWifiExtender=&quot;0&quot; WifiEnabled=&quot;1&quot; Orientation=&quot;-1&quot; SonarState=&quot;0&quot; /&gt;
+            &lt;/ZoneGroup&gt;
+            &lt;ZoneGroup Coordinator=&quot;RINCON_00000000000001400&quot; ID=&quot;RINCON_00000000000001400:66&quot;&gt;
+            &lt;ZoneGroupMember UUID=&quot;RINCON_00000000000001400&quot; Location=&quot;http://192.168.1.155:1400/xml/device_description.xml&quot; ZoneName=&quot;TV Room&quot; Icon=&quot;x-rincon-roomicon:tvroom&quot; Configuration=&quot;1&quot; Invisible=&quot;1&quot; SoftwareVersion=&quot;31.8-24090&quot; MinCompatibleVersion=&quot;29.0-00000&quot; LegacyCompatibleVersion=&quot;24.0-00000&quot; ChannelMapSet=&quot;RINCON_00000000000001400:LF,RF;RINCON_00000000000001400:SW,SW&quot; BootSeq=&quot;21&quot; WirelessMode=&quot;0&quot; HasConfiguredSSID=&quot;0&quot; ChannelFreq=&quot;2412&quot; BehindWifiExtender=&quot;0&quot; WifiEnabled=&quot;1&quot; Orientation=&quot;0&quot; SonarState=&quot;4&quot; /&gt;
+            &lt;ZoneGroupMember UUID=&quot;RINCON_00000000000001400&quot; Location=&quot;http://192.168.1.151:1400/xml/device_description.xml&quot; ZoneName=&quot;Kitchen&quot; Icon=&quot;x-rincon-roomicon:kitchen&quot; Configuration=&quot;1&quot; SoftwareVersion=&quot;31.8-24090&quot; MinCompatibleVersion=&quot;29.0-00000&quot; LegacyCompatibleVersion=&quot;24.0-00000&quot; BootSeq=&quot;114&quot; WirelessMode=&quot;0&quot; HasConfiguredSSID=&quot;0&quot; ChannelFreq=&quot;2412&quot; BehindWifiExtender=&quot;0&quot; WifiEnabled=&quot;1&quot; Orientation=&quot;0&quot; SonarState=&quot;4&quot; /&gt;
+            &lt;ZoneGroupMember UUID=&quot;RINCON_00000000000001400&quot; Location=&quot;http://192.168.1.153:1400/xml/device_description.xml&quot; ZoneName=&quot;Bedroom&quot; Icon=&quot;x-rincon-roomicon:bedroom&quot; Configuration=&quot;1&quot; SoftwareVersion=&quot;31.8-24090&quot; MinCompatibleVersion=&quot;29.0-00000&quot; LegacyCompatibleVersion=&quot;24.0-00000&quot; BootSeq=&quot;111&quot; WirelessMode=&quot;0&quot; HasConfiguredSSID=&quot;0&quot; ChannelFreq=&quot;2412&quot; BehindWifiExtender=&quot;0&quot; WifiEnabled=&quot;1&quot; Orientation=&quot;0&quot; SonarState=&quot;4&quot; /&gt;
+            &lt;ZoneGroupMember UUID=&quot;RINCON_00000000000001400&quot; Location=&quot;http://192.168.1.154:1400/xml/device_description.xml&quot; ZoneName=&quot;TV Room&quot; Icon=&quot;x-rincon-roomicon:tvroom&quot; Configuration=&quot;1&quot; SoftwareVersion=&quot;31.8-24090&quot; MinCompatibleVersion=&quot;29.0-00000&quot; LegacyCompatibleVersion=&quot;24.0-00000&quot; ChannelMapSet=&quot;RINCON_00000000000001400:LF,RF;RINCON_00000000000001400:SW,SW&quot; BootSeq=&quot;113&quot; WirelessMode=&quot;0&quot; HasConfiguredSSID=&quot;0&quot; ChannelFreq=&quot;2412&quot; BehindWifiExtender=&quot;0&quot; WifiEnabled=&quot;1&quot; Orientation=&quot;0&quot; SonarState=&quot;4&quot; /&gt;
+            &lt;ZoneGroupMember UUID=&quot;RINCON_00000000000001400&quot; Location=&quot;http://192.168.1.157:1400/xml/device_description.xml&quot; ZoneName=&quot;Bathroom&quot; Icon=&quot;x-rincon-roomicon:bathroom&quot; Configuration=&quot;1&quot; SoftwareVersion=&quot;31.8-24090&quot; MinCompatibleVersion=&quot;29.0-00000&quot; LegacyCompatibleVersion=&quot;24.0-00000&quot; BootSeq=&quot;44&quot; WirelessMode=&quot;0&quot; HasConfiguredSSID=&quot;0&quot; ChannelFreq=&quot;2412&quot; BehindWifiExtender=&quot;0&quot; WifiEnabled=&quot;1&quot; Orientation=&quot;0&quot; SonarState=&quot;4&quot; /&gt;
+            &lt;ZoneGroupMember UUID=&quot;RINCON_00000000000001400&quot; Location=&quot;http://192.168.1.156:1400/xml/device_description.xml&quot; ZoneName=&quot;Office&quot; Icon=&quot;x-rincon-roomicon:office&quot; Configuration=&quot;1&quot; SoftwareVersion=&quot;31.8-24090&quot; MinCompatibleVersion=&quot;29.0-00000&quot; LegacyCompatibleVersion=&quot;24.0-00000&quot; BootSeq=&quot;14&quot; WirelessMode=&quot;0&quot; HasConfiguredSSID=&quot;0&quot; ChannelFreq=&quot;2412&quot; BehindWifiExtender=&quot;0&quot; WifiEnabled=&quot;1&quot; Orientation=&quot;3&quot; SonarState=&quot;4&quot; /&gt;
+            &lt;/ZoneGroup&gt;
+            &lt;ZoneGroup Coordinator=&quot;RINCON_000PPP1400&quot; ID=&quot;RINCON_000PPP1400:49&quot;&gt;
+            &lt;ZoneGroupMember
+            BootSeq=&quot;8&quot;
+            Configuration=&quot;1&quot;
+            HTSatChanMapSet=&quot;RINCON_000PPP1400:LF,RF;RINCON_000RRR1400:RR;RINCON_000SSS1400:LR;RINCON_000QQQ1400:SW&quot;
+            Icon=&quot;x-rincon-roomicon:living&quot;
+            Location=&quot;http://192.168.1.103:1400/xml/device_description.xml&quot;
+            MinCompatibleVersion=&quot;22.0-00000&quot;
+            SoftwareVersion=&quot;24.0-71060&quot;
+            UUID=&quot;RINCON_000PPP1400&quot;
+            ZoneName=&quot;Home Theatre&quot;&gt;
+            &lt;Satellite
+            BootSeq=&quot;4&quot;
+            Configuration=&quot;1&quot;
+            HTSatChanMapSet=&quot;RINCON_000PPP1400:LF,RF;RINCON_000QQQ1400:SW&quot;
+            Icon=&quot;x-rincon-roomicon:living&quot;
+            Invisible=&quot;1&quot;
+            Location=&quot;http://192.168.1.104:1400/xml/device_description.xml&quot;
+            MinCompatibleVersion=&quot;22.0-00000&quot;
+            SoftwareVersion=&quot;24.0-71060&quot;
+            UUID=&quot;RINCON_000QQQ1400&quot;
+            ZoneName=&quot;Home Theatre&quot;/&gt;
+            &lt;Satellite
+            BootSeq=&quot;6&quot;
+            Configuration=&quot;1&quot;
+            HTSatChanMapSet=&quot;RINCON_000PPP1400:LF,RF;RINCON_000RRR1400:RR&quot;
+            Icon=&quot;x-rincon-roomicon:living&quot;
+            Invisible=&quot;1&quot;
+            Location=&quot;http://192.168.1.105:1400/xml/device_description.xml&quot;
+            MinCompatibleVersion=&quot;22.0-00000&quot;
+            SoftwareVersion=&quot;24.0-71060&quot;
+            UUID=&quot;RINCON_000RRR1400&quot;
+            ZoneName=&quot;Home Theatre&quot;/&gt;
+            &lt;Satellite
+            BootSeq=&quot;4&quot;
+            Configuration=&quot;1&quot;
+            HTSatChanMapSet=&quot;RINCON_000PPP1400:LF,RF;RINCON_000SSS1400:LR&quot;
+            Icon=&quot;x-rincon-roomicon:living&quot;
+            Invisible=&quot;1&quot;
+            Location=&quot;http://192.168.1.106:1400/xml/device_description.xml&quot;
+            MinCompatibleVersion=&quot;22.0-00000&quot;
+            SoftwareVersion=&quot;24.0-71060&quot;
+            UUID=&quot;RINCON_000SSS1400&quot;
+            ZoneName=&quot;Home Theatre&quot;/&gt;
+            &lt;/ZoneGroupMember&gt;
+            &lt;/ZoneGroups&gt;
+        </ZoneGroupState>
+    </e:property>
+    <e:property>
+        <AvailableSoftwareUpdate>&lt;UpdateItem xmlns=&quot;urn:schemas-rinconnetworks-com:update-1-0&quot; Type=&quot;Software&quot; Version=&quot;31.8-24090&quot; UpdateURL=&quot;http://update-firmware.sonos.com/firmware/beta/31.8-24090-v6.1-ubsrco-Beta2/^31.8-24090&quot; DownloadSize=&quot;0&quot; ManifestURL=&quot;http://update-firmware.sonos.com/firmware/beta/31.8-24090-v6.1-ubsrco-Beta2/vsrmwj/update_1450376622.upm&quot;/&gt;</AvailableSoftwareUpdate>
+    </e:property>
+    <e:property>
+        <AlarmRunSequence>RINCON_00000000000001400:14:0</AlarmRunSequence>
+    </e:property>
+    <e:property>
+        <ZoneGroupName></ZoneGroupName>
+    </e:property>
+    <e:property>
+        <ZoneGroupID></ZoneGroupID>
+    </e:property>
+    <e:property>
+        <ZonePlayerUUIDsInGroup></ZonePlayerUUIDsInGroup>
+    </e:property>
+</e:propertyset>
