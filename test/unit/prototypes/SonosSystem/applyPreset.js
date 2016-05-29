@@ -211,16 +211,20 @@ describe('SonosSystem.applyPreset', () => {
       preset = {
         test: {
           players: [{ roomName: 'Bedroom' }],
-          uri: 'x-rincon-stream:UUID_0000000001400'
+          uri: 'x-rincon-stream:UUID_0000000001400',
+          metadata: '<DIDL-Lite></DIDL-Lite>'
         }
       };
 
       return applyPreset.call(system, preset.test);
     });
 
-    it('Sets uri to preset uri', () => {
+    it('Sets uri to preset uri and metadata', () => {
       expect(player.setAVTransport).calledOnce;
+      expect(preset.test.uri).not.undefined;
+      expect(preset.test.metadata).not.undefined;
       expect(player.setAVTransport.firstCall.args[0]).equal(preset.test.uri);
+      expect(player.setAVTransport.firstCall.args[1]).equal(preset.test.metadata);
     });
   });
 });
