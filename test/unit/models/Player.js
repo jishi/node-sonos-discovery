@@ -78,7 +78,8 @@ describe('Player', () => {
           members: []
         }
       ],
-      on: sinon.stub()
+      on: sinon.stub(),
+      emit: sinon.spy()
     };
 
     player = new Player(zoneMemberData, listener, system);
@@ -185,6 +186,12 @@ describe('Player', () => {
       lastChange.outputfixed.val = '1';
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       expect(player.outputFixed).equals(true);
+    });
+
+    it('emits event', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(system.emit).calledOnce;
     });
   });
 
