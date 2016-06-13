@@ -88,6 +88,10 @@ describe('SonosSystem', () => {
       });
     });
 
+    beforeEach(() => {
+      listener.on.withArgs('listening').yield();
+    });
+
     it('Finds local endpoint', () => {
       expect(request).called;
       expect(request.firstCall.args[0].method).equals('GET');
