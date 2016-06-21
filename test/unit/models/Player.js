@@ -114,7 +114,7 @@ describe('Player', () => {
   });
 
   it('Subscribes to listener events', () => {
-    expect(listener.on).calledOnce;
+    expect(listener.on).calledTwice;
   });
 
   describe('When it recieves a transport-state update', () => {
