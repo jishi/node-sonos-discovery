@@ -151,7 +151,7 @@ describe('Player', () => {
       });
 
       expect(player.state.playMode).eql({
-        repeat: true,
+        repeat: 1,
         shuffle: true,
         crossfade: true
       });
