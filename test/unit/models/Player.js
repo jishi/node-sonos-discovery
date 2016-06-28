@@ -138,6 +138,7 @@ describe('Player', () => {
         absoluteAlbumArtUri: 'http://example.org/image1',
         duration: 318,
         uri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
+        type: 'track',
         radioShowMetaData: ''
       });
       expect(player.state.nextTrack).eql({
