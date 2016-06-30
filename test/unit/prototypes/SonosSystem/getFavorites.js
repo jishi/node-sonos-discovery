@@ -24,7 +24,7 @@ describe('getFavorites', () => {
   describe('When calling getFavorites', () => {
     before(() => {
       player = {
-        browseAll: sinon.stub().resolves(resultMock)
+        browseAll: sinon.stub().resolves(resultMock.items)
       };
 
       system = {
