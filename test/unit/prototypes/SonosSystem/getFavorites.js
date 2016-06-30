@@ -24,7 +24,7 @@ describe('getFavorites', () => {
   describe('When calling getFavorites', () => {
     before(() => {
       player = {
-        browse: sinon.stub().resolves(resultMock)
+        browseAll: sinon.stub().resolves(resultMock)
       };
 
       system = {
@@ -37,9 +37,9 @@ describe('getFavorites', () => {
         .then(success);
     });
 
-    it('Has called browse', () => {
-      expect(player.browse).calledOnce;
-      expect(player.browse.firstCall.args).eql(['FV:2', 0, 0]);
+    it('Has called browseAll', () => {
+      expect(player.browseAll).calledOnce;
+      expect(player.browseAll.firstCall.args).eql(['FV:2']);
     });
 
     it('Returns the expected result with undefined values filtered out', () => {

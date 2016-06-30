@@ -24,7 +24,7 @@ describe('getPlaylists', () => {
       };
 
       player = {
-        browse: sinon.stub().resolves(resultMock)
+        browseAll: sinon.stub().resolves(resultMock)
       };
 
       system = {
@@ -37,63 +37,14 @@ describe('getPlaylists', () => {
         .then(success);
     });
 
-    it('Has called browse', () => {
-      expect(player.browse).calledOnce;
-      expect(player.browse.firstCall.args).eql(['SQ:', 0, 0]);
+    it('Has called browseAll', () => {
+      expect(player.browseAll).calledOnce;
+      expect(player.browseAll.firstCall.args).eql(['SQ:']);
     });
 
     it('Returns the expected result', () => {
-      expect(success.firstCall.args[0]).eql(resultMock);
+      expect(success.firstCall.args[0]).eql(resultMock.items);
     });
   });
 
-  describe('When result is bigger than maximum chunk', () => {
-    let player;
-    before(() => {
-
-      player = {
-        browse: sinon.stub()
-      };
-
-      player.browse.onCall(0).resolves({
-        items: [1, 2, 3],
-        startIndex: 0,
-        numberReturned: 3,
-        totalMatches: 6
-      });
-
-      player.browse.onCall(1).resolves({
-        items: [4, 5, 6],
-        startIndex: 3,
-        numberReturned: 3,
-        totalMatches: 6
-      });
-
-      // This prevents the loop from continuing without noticing.
-      // Should not happen.
-      player.browse.onCall(2).rejects();
-
-      system = {
-        getAnyPlayer: sinon.stub().returns(player)
-      };
-
-      success = sinon.spy();
-
-      return getPlaylists.call(system)
-        .then(success);
-    });
-
-    it('Should call browse twice', () => {
-      expect(player.browse).calledTwice;
-    });
-
-    it('Has merged result', () => {
-      expect(success.firstCall.args[0]).eql({
-        items: [1, 2, 3, 4, 5, 6],
-        startIndex: 0,
-        numberReturned: 6,
-        totalMatches: 6
-      });
-    });
-  });
 });
