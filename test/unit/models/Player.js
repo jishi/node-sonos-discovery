@@ -508,11 +508,8 @@ describe('Player', () => {
       });
 
       it('Parses queue and returns a list of well designed objects', () => {
-        expect(queue.items).not.empty;
-        expect(queue.startIndex).equal(0);
-        expect(queue.numberReturned).equal(49);
-        expect(queue.totalMatches).equal(49);
-        expect(queue.items[0]).eql({
+        expect(queue).not.empty;
+        expect(queue[0]).eql({
           uri: 'x-sonos-spotify:spotify%3atrack%3a2uAWmcvujYUNTPCIb2VYKH?sid=9&flags=8224&sn=2',
           artist: 'Deftones',
           metadata: undefined,
