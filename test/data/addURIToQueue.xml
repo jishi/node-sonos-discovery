@@ -1,0 +1,9 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <s:Body>
+        <u:AddURIToQueueResponse xmlns:u="urn:schemas-upnp-org:service:AVTransport:1">
+            <FirstTrackNumberEnqueued>1</FirstTrackNumberEnqueued>
+            <NumTracksAdded>1</NumTracksAdded>
+            <NewQueueLength>1</NewQueueLength>
+        </u:AddURIToQueueResponse>
+    </s:Body>
+</s:Envelope>
