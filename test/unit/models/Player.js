@@ -450,9 +450,8 @@ describe('Player', () => {
     let now;
 
     beforeEach((done) => {
-      let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
-      positionXml.statusCode = 200;
-      soap.invoke.resolves(positionXml);
+      let positionJson = require('../../data/getpositioninfo.json');
+      soap.invoke.resolves(positionJson);
       let lastChange = require('../../data/avtransportlastchange.json');
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       player.on('transport-state', () => {
@@ -474,9 +473,8 @@ describe('Player', () => {
     });
 
     it('elapsedTime is dynamically calculated', () => {
-      let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
-      positionXml.statusCode = 200;
-      soap.invoke.resolves(positionXml);
+      let positionJson = require('../../data/getpositioninfo.json');
+      soap.invoke.resolves(positionJson);
       let lastChange = require('../../data/avtransportlastchange.json');
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       clock.tick(6000);
@@ -488,9 +486,9 @@ describe('Player', () => {
     describe('Return queue', () => {
       let queue;
       beforeEach(() => {
-        let queueStream = fs.createReadStream(path.join(__dirname, '../../data/queue.xml'));
+        let queueJson = require('../../data/queue.json');
 
-        soap.invoke.returns(Promise.resolve(queueStream));
+        soap.invoke.returns(Promise.resolve(queueJson));
 
         return player.getQueue()
           .then((q) => {
@@ -523,9 +521,9 @@ describe('Player', () => {
     describe('Parsing playlists', () => {
       let queue;
       beforeEach(() => {
-        let queueStream = fs.createReadStream(path.join(__dirname, '../../data/playlists.xml'));
+        let queueJson = require('../../data/playlists.json');
 
-        soap.invoke.returns(Promise.resolve(queueStream));
+        soap.invoke.returns(Promise.resolve(queueJson));
 
         return player.browse()
           .then((q) => {
