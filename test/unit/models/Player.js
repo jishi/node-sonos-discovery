@@ -152,7 +152,7 @@ describe('Player', () => {
       });
 
       expect(player.state.playMode).eql({
-        repeat: true,
+        repeat: 'all',
         shuffle: true,
         crossfade: true
       });
@@ -329,7 +329,7 @@ describe('Player', () => {
         { playMode: 'SHUFFLE_NOREPEAT' }
       ]);
 
-      player.state.playMode.repeat = true;
+      player.state.playMode.repeat = 'all';
       player.shuffle(true);
       expect(soap.invoke.secondCall.args).eql([
         'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
