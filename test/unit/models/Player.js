@@ -102,15 +102,16 @@ describe('Player', () => {
   });
 
   it('Subscribes to the various notifications by default', () => {
-    expect(Subscriber).callCount(3);
+    expect(Subscriber).callCount(4);
     expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/AVTransport/Event', 'http://127.0.0.2/')).calledOnce;
     expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/RenderingControl/Event', 'http://127.0.0.2/')).calledOnce;
     expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaRenderer/GroupRenderingControl/Event', 'http://127.0.0.2/')).calledOnce;
+    expect(Subscriber.withArgs('http://192.168.1.151:1400/MediaServer/ContentDirectory/Event', 'http://127.0.0.2/')).calledOnce;
   });
 
   it('Invokes dispose on all listeners when disposing player', () => {
     player.dispose();
-    expect(subscriber.dispose).callCount(3);
+    expect(subscriber.dispose).callCount(4);
   });
 
   it('Subscribes to listener events', () => {
