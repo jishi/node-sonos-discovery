@@ -152,7 +152,7 @@ describe('Player', () => {
       });
 
       expect(player.state.playMode).eql({
-        repeat: true,
+        repeat: 'all',
         shuffle: true,
         crossfade: true
       });
@@ -329,7 +329,7 @@ describe('Player', () => {
         { playMode: 'SHUFFLE_NOREPEAT' }
       ]);
 
-      player.state.playMode.repeat = true;
+      player.state.playMode.repeat = 'all';
       player.shuffle(true);
       expect(soap.invoke.secondCall.args).eql([
         'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
@@ -409,8 +409,13 @@ describe('Player', () => {
     });
 
     it('addURIToQueue', () => {
+      let addURIToQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToQueue.xml`);
+      addURIToQueueXml.statusCode = 200;
+      soap.invoke.resolves(addURIToQueueXml);
+
       expect(TYPE.AddURIToQueue).not.undefined;
-      expect(player.addURIToQueue('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')).equal('promise');
+      expect(player.addURIToQueue('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')).eql({});
+      expect(soap.invoke).calledOnce;
       expect(soap.invoke.firstCall.args).eql([
         'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
         TYPE.AddURIToQueue,
