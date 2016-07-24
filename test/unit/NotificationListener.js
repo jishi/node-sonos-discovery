@@ -132,14 +132,14 @@ describe('NotificationListener', () => {
     http.createServer.yield(xmlStream, res);
   });
 
-  it('Emits favorite-change', (done) => {
+  it('Emits list-change', (done) => {
     let listener = sinon.spy(function () {
       expect(listener).calledOnce;
-      expect(listener.firstCall.args[0]).equal('RINCON_12345678900001400');
+      expect(listener.firstCall.args[0]).equal('favorites');
       done();
     });
 
-    notificationListener.on('favorites-change', listener);
+    notificationListener.on('list-change', listener);
     let xmlStream = fs.createReadStream(__dirname + '/../data/favoritechange.xml');
     xmlStream.method = 'NOTIFY';
     xmlStream.headers = {
