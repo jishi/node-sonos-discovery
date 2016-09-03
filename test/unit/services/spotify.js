@@ -18,7 +18,7 @@ describe('spotify', function () {
 
     return spotify.tryGetHighResArt('x-sonos-spotify:spotify%3atrack%3a3WKg25vrbjJlkhsgl2W4p3?sid=9&flags=8224&sn=9')
       .then((url) => {
-        expect(url).to.equal('https://i.scdn.co/image/905d15abb3b2fcc9551d5be90213df448da8f7f4');
+        expect(url).to.have.string('https://i.scdn.co/image/');
       });
   });
 
