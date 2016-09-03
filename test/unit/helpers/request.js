@@ -133,7 +133,6 @@ describe('request', () => {
     }).catch((e) => {
       expect(e).instanceOf(Error);
       expect(e.statusCode).equals(500);
-      expect(e.message).equals('This is an error');
     });
 
     http.request.yield({
