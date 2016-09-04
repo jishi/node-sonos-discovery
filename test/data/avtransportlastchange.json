@@ -49,7 +49,7 @@
     "val": "x-rincon-queue:RINCON_00000000000001400#0"
   },
   "avtransporturimetadata": {
-    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\" restricted=\"true\"><res protocolInfo=\"sonos.com-spotify:*:audio/x-spotify:*\" duration=\"0:04:01\">x-sonos-spotify:spotify%3atrack%3a0Ap3aOVU7LItcHIFiRF8lY?sid=9&amp;flags=8224&amp;sn=9</res><upnp:albumArtURI>/getaa?s=1&amp;u=x-sonos-spotify%3aspotify%253atrack%253a0Ap3aOVU7LItcHIFiRF8lY%3fsid%3d9%26flags%3d8224%26sn%3d9</upnp:albumArtURI><dc:title>Here To Mars</dc:title><upnp:class>object.item.audioItem.musicTrack</upnp:class><dc:creator>Coheed and Cambria</dc:creator><upnp:album>The Color Before The Sun</upnp:album></item></DIDL-Lite>"
+    "val": ""
   },
   "nextavtransporturi": {
     "val": ""

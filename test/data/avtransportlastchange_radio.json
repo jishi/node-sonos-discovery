@@ -1,0 +1,108 @@
+{
+  "$name": "instanceid",
+  "$attrs": {
+    "val": "0"
+  },
+  "transportstate": {
+    "val": "PLAYING"
+  },
+  "currentplaymode": {
+    "val": "SHUFFLE"
+  },
+  "currentcrossfademode": {
+    "val": "1"
+  },
+  "numberoftracks": {
+    "val": "2"
+  },
+  "currenttrack": {
+    "val": "1"
+  },
+  "currentsection": {
+    "val": "0"
+  },
+  "currenttrackuri": {
+    "val": "aac://fm03-icecast.mtg-r.net/fm03_aac"
+  },
+  "currenttrackduration": {
+    "val": "0:00:00"
+  },
+  "currenttrackmetadata": {
+    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\" restricted=\"true\"><res protocolInfo=\"sonos.com-http:*:application/octet-stream:*\">x-sonosapi-stream:s17553?sid=254&amp;flags=8224&amp;sn=0</res><r:streamContent>Leona Lewis - Bleeding Love</r:streamContent><r:radioShowMd></r:radioShowMd><upnp:albumArtURI>/getaa?s=1&amp;u=x-sonosapi-stream%3as17553%3fsid%3d254%26flags%3d8224%26sn%3d0</upnp:albumArtURI><dc:title>x-sonosapi-stream:s17553?sid=254&amp;flags=8224&amp;sn=0</dc:title><upnp:class>object.item</upnp:class></item></DIDL-Lite>"
+  },
+  "r:nexttrackuri": {
+    "val": ""
+  },
+  "r:nexttrackmetadata": {
+    "val": ""
+  },
+  "r:enqueuedtransporturi": {
+    "val": "x-sonosapi-stream:s17553?sid=254&amp;flags=8224&amp;sn=0"
+  },
+  "r:enqueuedtransporturimetadata": {
+    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\" restricted=\"true\"><dc:title>Lugna Favoriter</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id=\"cdudn\" nameSpace=\"urn:schemas-rinconnetworks-com:metadata-1-0/\">SA_RINCON65031_</desc></item></DIDL-Lite>"
+  },
+  "playbackstoragemedium": {
+    "val": "NETWORK"
+  },
+  "avtransporturi": {
+    "val": "x-sonosapi-stream:s17553?sid=254&amp;flags=8224&amp;sn=0"
+  },
+  "avtransporturimetadata": {
+    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\"xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\" restricted=\"true\"><dc:title>Lugna Favoriter</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id=\"cdudn\" nameSpace=\"urn:schemas-rinconnetworks-com:metadata-1-0/\">SA_RINCON65031_</desc></item></DIDL-Lite>"
+  },
+  "nextavtransporturi": {
+    "val": ""
+  },
+  "nextavtransporturimetadata": {
+    "val": ""
+  },
+  "currenttransportactions": {
+    "val": "Set, Stop, Play"
+  },
+  "r:currentvalidplaymodes": {
+    "val": ""
+  },
+  "r:musesessions": {
+    "val": ""
+  },
+  "transportstatus": {
+    "val": "OK"
+  },
+  "r:sleeptimergeneration": {
+    "val": "0"
+  },
+  "r:alarmrunning": {
+    "val": "0"
+  },
+  "r:snoozerunning": {
+    "val": "0"
+  },
+  "r:restartpending": {
+    "val": "0"
+  },
+  "transportplayspeed": {
+    "val": "NOT_IMPLEMENTED"
+  },
+  "currentmediaduration": {
+    "val": "NOT_IMPLEMENTED"
+  },
+  "recordstoragemedium": {
+    "val": "NOT_IMPLEMENTED"
+  },
+  "possibleplaybackstoragemedia": {
+    "val": "NONE, NETWORK"
+  },
+  "possiblerecordstoragemedia": {
+    "val": "NOT_IMPLEMENTED"
+  },
+  "recordmediumwritestatus": {
+    "val": "NOT_IMPLEMENTED"
+  },
+  "currentrecordqualitymode": {
+    "val": "NOT_IMPLEMENTED"
+  },
+  "possiblerecordqualitymodes": {
+    "val": "NOT_IMPLEMENTED"
+  }
+}

@@ -118,7 +118,7 @@ describe('Player', () => {
     expect(listener.on).calledTwice;
   });
 
-  describe('When it recieves a transport-state update', () => {
+  describe('When it recieves a transport-state update for queue playback', () => {
     beforeEach((done) => {
       soap.invoke.resolves();
       let lastChange = require('../../data/avtransportlastchange.json');
@@ -163,7 +163,50 @@ describe('Player', () => {
     });
 
     it('Updates avTransportUriMetadata', () => {
-      expect(player.avTransportUriMetadata).equals('<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\" restricted=\"true\"><res protocolInfo=\"sonos.com-spotify:*:audio/x-spotify:*\" duration=\"0:04:01\">x-sonos-spotify:spotify%3atrack%3a0Ap3aOVU7LItcHIFiRF8lY?sid=9&amp;flags=8224&amp;sn=9</res><upnp:albumArtURI>/getaa?s=1&amp;u=x-sonos-spotify%3aspotify%253atrack%253a0Ap3aOVU7LItcHIFiRF8lY%3fsid%3d9%26flags%3d8224%26sn%3d9</upnp:albumArtURI><dc:title>Here To Mars</dc:title><upnp:class>object.item.audioItem.musicTrack</upnp:class><dc:creator>Coheed and Cambria</dc:creator><upnp:album>The Color Before The Sun</upnp:album></item></DIDL-Lite>');
+      expect(player.avTransportUriMetadata).equals('');
+    });
+  });
+
+  describe('When it recieves a transport-state update for radio playback', () => {
+    beforeEach((done) => {
+      soap.invoke.resolves();
+      let lastChange = require('../../data/avtransportlastchange_radio.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      player.on('transport-state', () => {
+        done();
+      });
+    });
+
+    it('Updates state', () => {
+      expect(player.state.playbackState).equals('PLAYING');
+      expect(player.state.trackNo).equals(1);
+      expect(player.state.currentTrack).eql({
+        artist: 'Lugna Favoriter',
+        title: 'Leona Lewis - Bleeding Love',
+        album: undefined,
+        albumArtUri: '/getaa?s=1&u=x-sonosapi-stream%3as17553%3fsid%3d254%26flags%3d8224%26sn%3d0',
+        absoluteAlbumArtUri: 'http://192.168.1.151:1400/getaa?s=1&u=x-sonosapi-stream%3as17553%3fsid%3d254%26flags%3d8224%26sn%3d0',
+        duration: 0,
+        uri: 'x-sonosapi-stream:s17553?sid=254&flags=8224&sn=0',
+        type: 'radio'
+      });
+
+      expect(player.state.nextTrack).eql({
+        artist: '',
+        title: '',
+        album: '',
+        albumArtUri: '',
+        duration: 0,
+        uri: ''
+      });
+    });
+
+    it('Updates avTransportUri', () => {
+      expect(player.avTransportUri).equals('x-sonosapi-stream:s17553?sid=254&amp;flags=8224&amp;sn=0');
+    });
+
+    it('Updates avTransportUriMetadata', () => {
+      expect(player.avTransportUriMetadata).equals('<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"><item id="-1" parentID="-1" restricted="true"><dc:title>Lugna Favoriter</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">SA_RINCON65031_</desc></item></DIDL-Lite>');
     });
   });
 
