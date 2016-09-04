@@ -210,6 +210,22 @@ describe('Player', () => {
     });
   });
 
+  describe('When radio already has an absolute url', () => {
+    beforeEach((done) => {
+      soap.invoke.resolves();
+      let lastChange = require('../../data/avtransportlastchange_radio.json');
+      lastChange.currenttrackmetadata.val = '<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"><item id="-1" parentID="-1" restricted="true"><res protocolInfo="sonos.com-http:*:application/octet-stream:*">x-sonosapi-stream:s20308?sid=254&amp;flags=32</res><r:streamContent>P5 STHLM - Sebastian Ingrosso - Dark River</r:streamContent><r:radioShowMd></r:radioShowMd><upnp:albumArtURI>http://absolute.url/for/test</upnp:albumArtURI><dc:title>x-sonosapi-stream:s20308?sid=254&amp;flags=32</dc:title><upnp:class>object.item</upnp:class></item></DIDL-Lite>';
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      player.on('transport-state', () => {
+        done();
+      });
+    });
+
+    it('Should not touch absoluteAlbumUri', () => {
+      expect(player.state.currentTrack.absoluteAlbumArtUri).equal('http://absolute.url/for/test');
+    });
+  });
+
   describe('when volume event occurs', () => {
     it('Updates volume', () => {
       let lastChange = require('../../data/renderingControlLastChange.json');
