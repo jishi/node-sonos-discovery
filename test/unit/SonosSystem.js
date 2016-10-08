@@ -2,6 +2,9 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
+const fs = require('fs');
+const soap = require('../../lib/helpers/soap');
+const UnknownServiceError = require('../../lib/errors/unknown-service');
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
 
@@ -48,8 +51,10 @@ describe('SonosSystem', () => {
     }));
 
     Sub = sinon.spy(proxyquire('../../lib/models/Sub', {
-    '../Subscriber': Subscriber
-  }));
+      '../Subscriber': Subscriber
+    }));
+
+    sinon.stub(soap, 'invoke').resolves(fs.createReadStream(`${__dirname}/../data/listavailableservices.xml`));
 
     SonosSystem = proxyquire('../../lib/SonosSystem', {
       './sonos-ssdp': ssdp,
@@ -59,8 +64,14 @@ describe('SonosSystem', () => {
       './models/Player': Player,
       './models/Sub': Sub
     });
+  });
 
+  beforeEach(() => {
     sonos = new SonosSystem();
+  });
+
+  afterEach(() => {
+    soap.invoke.restore();
   });
 
   it('Loaded prototypes', () => {
@@ -188,6 +199,33 @@ describe('SonosSystem', () => {
         expect(player).instanceOf(Player);
         expect(player.roomName).equals('TV Room');
       });
+
+      describe('After initialized', () => {
+        beforeEach((done) => {
+          sonos.on('initialized', done);
+        });
+
+        it('Called ListAvailableServices with valid player', () => {
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args[0]).equal('http://192.168.1.151:1400/MusicServices/Control');
+        });
+
+        it('Can lookup SID from service name', () => {
+          expect(sonos.getServiceId('Spotify')).to.equal(9);
+          expect(sonos.getServiceId('Apple Music')).to.equal(204);
+        });
+
+        it('Can lookup type from service name', () => {
+          expect(sonos.getServiceType('Spotify')).to.equal(2311);
+          expect(sonos.getServiceType('Apple Music')).to.equal(52231);
+        });
+
+        it('Throws error on unknown service', () => {
+          expect(sonos.getServiceId.bind(sonos, 'UNKNOWN SERVICE')).to.throw(UnknownServiceError);
+          expect(sonos.getServiceType.bind(sonos, 'UNKNOWN SERVICE')).to.throw(UnknownServiceError);
+        });
+      });
+
     });
   });
 });
