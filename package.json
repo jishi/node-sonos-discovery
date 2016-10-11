@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "chai": "*",
-    "jscs": "^2.11.0",
+    "jscs": "^3.0.7",
     "jshint": "~2.8.0",
     "mocha": "*",
     "proxyquire": "^1.7.3",

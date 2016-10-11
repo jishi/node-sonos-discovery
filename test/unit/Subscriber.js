@@ -8,9 +8,10 @@ require('sinon-as-promised');
 describe('Subscriber', () => {
   let request;
   let Subscriber;
+  let successfulRequest;
 
   beforeEach(() => {
-
+    successfulRequest = { headers: { sid: 1234567 } };
     request = sinon.stub();
     Subscriber = proxyquire('../../lib/Subscriber', {
       './helpers/request': request
@@ -18,7 +19,7 @@ describe('Subscriber', () => {
   });
 
   it('Sends a subscription with the correct parameters', () => {
-    request.resolves({});
+    request.resolves(successfulRequest);
     new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
     expect(request).calledOnce;
     expect(request.firstCall.args[0]).eql({
@@ -35,7 +36,7 @@ describe('Subscriber', () => {
 
   it('Resubscribes if failure', function (done) {
     request.rejects('Rejecting subscribe attempt. This is a mocked error');
-    request.onCall(2).resolves();
+    request.onCall(2).resolves(successfulRequest);
     let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600, 100);
 
     setTimeout(() => {

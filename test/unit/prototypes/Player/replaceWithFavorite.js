@@ -64,10 +64,6 @@ describe('Player.replaceWithFavorite', () => {
       expect(player.setAVTransport).calledOnce;
       expect(player.setAVTransport.firstCall.args[0]).equal(`x-rincon-queue:${player.uuid}#0`);
     });
-
-    it('Starts playback', () => {
-      expect(player.play).calledOnce;
-    });
   });
 
   describe('When replacing with radio favorite', () => {
@@ -114,10 +110,6 @@ describe('Player.replaceWithFavorite', () => {
       expect(player.setAVTransport).calledOnce;
       expect(player.setAVTransport.firstCall.args[0]).equal(favorites[0].uri);
       expect(player.setAVTransport.firstCall.args[1]).equal(favorites[0].metadata);
-    });
-
-    it('Starts playback', () => {
-      expect(player.play).calledOnce;
     });
   });
 

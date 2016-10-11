@@ -3,7 +3,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 require('chai').use(require('sinon-chai'));
 
-describe('SonosSystem.applyPreset', () => {
+describe.only('SonosSystem.applyPreset', () => {
   const applyPreset = require('../../../../lib/prototypes/SonosSystem/applyPreset.js');
 
   describe('When applying a preset', () => {
@@ -21,11 +21,10 @@ describe('SonosSystem.applyPreset', () => {
         pause: sinon.stub().resolves(),
         setAVTransport: sinon.stub().resolves(),
         replaceWithFavorite: sinon.stub().resolves(),
-        repeat: sinon.stub().resolves(),
-        shuffle: sinon.stub().resolves(),
-        crossfade: sinon.stub().resolves(),
+        setPlayMode: sinon.stub().resolves(),
         trackSeek: sinon.stub().resolves(),
         timeSeek: sinon.stub().resolves(),
+        sleep: sinon.stub().resolves(),
         becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
         uuid: 'RINCON_0000000001400'
       };
@@ -71,7 +70,8 @@ describe('SonosSystem.applyPreset', () => {
           favorite: 'My favorite',
           trackNo: 12,
           elapsedTime: 120,
-          state: 'playing'
+          state: 'playing',
+          sleep: 600
         }
       };
 
@@ -115,12 +115,8 @@ describe('SonosSystem.applyPreset', () => {
     });
 
     it('Sets correct playmode', () => {
-      expect(player.repeat).calledOnce;
-      expect(player.repeat.firstCall.args[0]).eql(preset.test.playMode.repeat);
-      expect(player.shuffle).calledOnce;
-      expect(player.shuffle.firstCall.args[0]).eql(preset.test.playMode.shuffle);
-      expect(player.crossfade).calledOnce;
-      expect(player.crossfade.firstCall.args[0]).eql(preset.test.playMode.crossfade);
+      expect(player.setPlayMode).calledOnce;
+      expect(player.setPlayMode.firstCall.args[0]).eql(preset.test.playMode);
     });
 
     it('Skips to correct track', () => {
@@ -131,6 +127,11 @@ describe('SonosSystem.applyPreset', () => {
     it('Skips to correct time', () => {
       expect(player.timeSeek).calledOnce;
       expect(player.timeSeek.firstCall.args[0]).equal(preset.test.elapsedTime);
+    });
+
+    it('Should call sleep', () => {
+      expect(player.sleep).calledOnce;
+      expect(player.sleep.firstCall.args[0]).equal(preset.test.sleep);
     });
 
     it('Should start playback', () => {

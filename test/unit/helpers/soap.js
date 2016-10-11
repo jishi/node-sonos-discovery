@@ -10,7 +10,7 @@ describe('soap', () => {
   let soap;
 
   beforeEach(() => {
-    request = sinon.stub().resolves();
+    request = sinon.stub().resolves({ statusCode: 200 });
 
     soap = proxyquire('../../../lib/helpers/soap', {
       './request': request
@@ -35,6 +35,7 @@ describe('soap', () => {
       stream: true
     });
     expect(result).instanceOf(Promise);
+    return result;
   });
 
   it('Supports calls without values', () => {

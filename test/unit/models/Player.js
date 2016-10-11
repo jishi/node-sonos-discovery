@@ -5,6 +5,7 @@ const proxyquire = require('proxyquire');
 const fs = require('fs');
 const path = require('path');
 require('chai').use(require('sinon-chai'));
+require('sinon-as-promised');
 
 describe('Player', () => {
   let zoneMemberData;
@@ -361,56 +362,85 @@ describe('Player', () => {
       ]);
     });
 
-    it('Repeat', () => {
-      expect(TYPE.SetPlayMode).not.undefined;
-      expect(player.repeat(true)).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.SetPlayMode,
-        { playMode: 'REPEAT_ALL' }
-      ]);
+    describe('Playmode dependant tests', () => {
 
-      player.state.playMode.shuffle = true;
-      player.repeat(true);
-      expect(soap.invoke.secondCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.SetPlayMode,
-        { playMode: 'SHUFFLE' }
-      ]);
-    });
+      beforeEach(() => {
+        soap.invoke = sinon.stub().resolves();
+      });
 
-    it('Shuffle', () => {
-      expect(TYPE.SetPlayMode).not.undefined;
-      expect(player.shuffle(true)).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.SetPlayMode,
-        { playMode: 'SHUFFLE_NOREPEAT' }
-      ]);
+      it('Repeat with no state', () => {
+        expect(TYPE.SetPlayMode).not.undefined;
+        return player.repeat(true)
+          .then(() => {
+            expect(soap.invoke).calledOnce;
+            expect(soap.invoke.firstCall.args).eql([
+              'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+              TYPE.SetPlayMode,
+              { playMode: 'REPEAT_ALL' }
+            ]);
+          });
 
-      player.state.playMode.repeat = 'all';
-      player.shuffle(true);
-      expect(soap.invoke.secondCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.SetPlayMode,
-        { playMode: 'SHUFFLE' }
-      ]);
-    });
+      });
 
-    it('Crossfade', () => {
-      expect(TYPE.SetCrossfadeMode).not.undefined;
-      expect(player.crossfade(true)).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.SetCrossfadeMode,
-        { crossfadeMode: 1 }
-      ]);
-      player.crossfade(false);
-      expect(soap.invoke.secondCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.SetCrossfadeMode,
-        { crossfadeMode: 0 }
-      ]);
+      it('Repeat with shuffle on', () => {
+        player.state.playMode.shuffle = true;
+        return player.repeat(true)
+          .then(() => {
+            expect(soap.invoke.firstCall.args).eql([
+              'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+              TYPE.SetPlayMode,
+              { playMode: 'SHUFFLE' }
+            ]);
+          });
+      });
+
+      it('Shuffle on with no other state', () => {
+        expect(TYPE.SetPlayMode).not.undefined;
+        return player.shuffle(true)
+          .then(() => {
+            expect(soap.invoke.firstCall.args).eql([
+              'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+              TYPE.SetPlayMode,
+              { playMode: 'SHUFFLE_NOREPEAT' }
+            ]);
+          });
+      });
+
+      it('Shuffle off', () => {
+        player.state.playMode.repeat = 'all';
+        return player.shuffle(true)
+          .then(() => {
+            expect(soap.invoke.firstCall.args).eql([
+              'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+              TYPE.SetPlayMode,
+              { playMode: 'SHUFFLE' }
+            ]);
+          });
+      });
+
+      it('Crossfade on', () => {
+        expect(TYPE.SetCrossfadeMode).not.undefined;
+        return player.crossfade(true)
+          .then(() => {
+            expect(soap.invoke.firstCall.args).eql([
+              'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+              TYPE.SetCrossfadeMode,
+              { crossfadeMode: 1 }
+            ]);
+          });
+      });
+
+      it('Crossfade off', () => {
+        return player.crossfade(false)
+          .then(() => {
+            expect(soap.invoke.firstCall.args).eql([
+              'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+              TYPE.SetCrossfadeMode,
+              { crossfadeMode: 0 }
+            ]);
+          });
+      });
+
     });
 
     it('Sleep', () => {
