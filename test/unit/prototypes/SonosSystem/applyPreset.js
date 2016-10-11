@@ -3,7 +3,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 require('chai').use(require('sinon-chai'));
 
-describe.only('SonosSystem.applyPreset', () => {
+describe('SonosSystem.applyPreset', () => {
   const applyPreset = require('../../../../lib/prototypes/SonosSystem/applyPreset.js');
 
   describe('When applying a preset', () => {
