@@ -7,6 +7,8 @@ const path = require('path');
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
 
+const soap = require('../../../lib/helpers/soap');
+
 describe('Player', () => {
   let zoneMemberData;
   let request;
@@ -15,11 +17,22 @@ describe('Player', () => {
   let Subscriber;
   let subscriber;
   let listener;
-  let soap;
   let system;
   let musicServices;
 
   let TYPE = require('../../../lib/helpers/soap').TYPE;
+
+  beforeEach(() => {
+    sinon.stub(soap, 'invoke').resolves();
+    sinon.stub(soap, 'parse');
+  });
+
+  afterEach(() => {
+    if (soap.invoke.restore)
+      soap.invoke.restore();
+    if (soap.parse.restore)
+      soap.parse.restore();
+  });
 
   beforeEach(() => {
     zoneMemberData = {
@@ -49,10 +62,6 @@ describe('Player', () => {
 
     Subscriber = sinon.stub().returns(subscriber);
 
-    soap = {
-      invoke: sinon.stub().returns('promise')
-    };
-
     musicServices = {
       tryGetHighResArt: sinon.stub()
     };
@@ -63,7 +72,6 @@ describe('Player', () => {
     Player = proxyquire('../../../lib/models/Player', {
       '../helpers/request': request,
       '../Subscriber': Subscriber,
-      '../helpers/soap': soap,
       '../musicservices': musicServices
     });
 
@@ -119,9 +127,8 @@ describe('Player', () => {
     expect(listener.on).calledTwice;
   });
 
-  describe('When it recieves a transport-state update for queue playback', () => {
+  describe('When it receives a transport-state update for queue playback', () => {
     beforeEach((done) => {
-      soap.invoke.resolves();
       let lastChange = require('../../data/avtransportlastchange.json');
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       player.on('transport-state', () => {
@@ -170,7 +177,6 @@ describe('Player', () => {
 
   describe('When it recieves a transport-state update for radio playback', () => {
     beforeEach((done) => {
-      soap.invoke.resolves();
       let lastChange = require('../../data/avtransportlastchange_radio.json');
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       player.on('transport-state', () => {
@@ -261,41 +267,46 @@ describe('Player', () => {
   });
 
   describe('commands', () => {
-    it('Basic actions', () => {
-      const cases = [
-        { type: TYPE.Play, action: 'play' },
-        { type: TYPE.Pause, action: 'pause' },
-        { type: TYPE.Next, action: 'nextTrack' },
-        { type: TYPE.Previous, action: 'previousTrack' }
-      ];
-      cases.forEach((test) => {
-        // Need to reset this in the loop since we are testing multiple actions
-        soap.invoke.reset();
+
+    const simpleCases = [
+      { type: TYPE.Play, action: 'play' },
+      { type: TYPE.Pause, action: 'pause' },
+      { type: TYPE.Next, action: 'nextTrack' },
+      { type: TYPE.Previous, action: 'previousTrack' }
+    ];
+    simpleCases.forEach((test) => {
+      it(`${test.action}`, () => {
         expect(test.type, test.action).not.undefined;
-        expect(player[test.action](), test.action).equal('promise');
-        expect(soap.invoke.firstCall.args, test.action).eql([
-          'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-          test.type
-        ]);
+        return player[test.action]()
+          .then(() => {
+            expect(soap.invoke.firstCall.args, test.action).eql([
+              'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+              test.type
+            ]);
+          });
       });
     });
 
-    it('Volume', () => {
-      const cases = [
-        { type: TYPE.Volume, action: 'setVolume', value: 10, expectation: 10 },
-        { type: TYPE.Volume, action: 'setVolume', value: '+1', expectation: 11 },
-        { type: TYPE.Volume, action: 'setVolume', value: '-1', expectation: 10 }
-      ];
-      cases.forEach((test) => {
-        // Need to reset this in the loop since we are testing multiple actions
-        soap.invoke.reset();
+    beforeEach(() => {
+      player._state.volume = 5;
+    });
+
+    const volumeCases = [
+      { type: TYPE.Volume, action: 'setVolume', value: 10, expectation: 10 },
+      { type: TYPE.Volume, action: 'setVolume', value: '+1', expectation: 6 },
+      { type: TYPE.Volume, action: 'setVolume', value: '-1', expectation: 4 }
+    ];
+    volumeCases.forEach((test) => {
+      it(`Volume ${test.value} should be ${test.expectation}`, () => {
         expect(test.type, test.action).not.undefined;
-        expect(player[test.action](test.value), test.action).equal('promise');
-        expect(soap.invoke.firstCall.args, test.action).eql([
-          'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
-          test.type,
-          { volume: test.expectation }
-        ]);
+        return player[test.action](test.value)
+          .then(() => {
+            expect(soap.invoke.firstCall.args, test.action).eql([
+              'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
+              test.type,
+              { volume: test.expectation }
+            ]);
+          });
       });
     });
 
@@ -307,66 +318,66 @@ describe('Player', () => {
         });
     });
 
-    it('Mute', () => {
-      const cases = [
-        { type: TYPE.Mute, action: 'mute', expectation: 1 },
-        { type: TYPE.Mute, action: 'unMute', expectation: 0 }
-      ];
-      cases.forEach((test) => {
-        // Need to reset this in the loop since we are testing multiple actions
-        soap.invoke.reset();
+    const muteCases = [
+      { type: TYPE.Mute, action: 'mute', expectation: 1 },
+      { type: TYPE.Mute, action: 'unMute', expectation: 0 }
+    ];
+    muteCases.forEach((test) => {
+      it(`${test.action}`, () => {
         expect(test.type, test.action).not.undefined;
-        expect(player[test.action](), test.action).equal('promise');
-        expect(soap.invoke.firstCall.args, test.action).eql([
-          'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
-          test.type,
-          { mute: test.expectation }
-        ]);
+        return player[test.action]()
+          .then(() => {
+            expect(soap.invoke.firstCall.args, test.action).eql([
+              'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
+              test.type,
+              { mute: test.expectation }
+            ]);
+          });
       });
     });
 
-    it('Seek', () => {
-      const cases = [
-        { type: TYPE.Seek, action: 'timeSeek', value: 120, expectation: { unit: 'REL_TIME', value: '00:02:00' } },
-        { type: TYPE.Seek, action: 'trackSeek', value: 12, expectation: { unit: 'TRACK_NR', value: 12 } }
-      ];
-      cases.forEach((test) => {
-        // Need to reset this in the loop since we are testing multiple actions
-        soap.invoke.reset();
+    const seekCases = [
+      { type: TYPE.Seek, action: 'timeSeek', value: 120, expectation: { unit: 'REL_TIME', value: '00:02:00' } },
+      { type: TYPE.Seek, action: 'trackSeek', value: 12, expectation: { unit: 'TRACK_NR', value: 12 } }
+    ];
+    seekCases.forEach((test) => {
+      it(`${test.action}`, () => {
         expect(test.type, test.action).not.undefined;
-        expect(player[test.action](test.value), test.action).equal('promise');
-        expect(soap.invoke.firstCall.args, test.action).eql([
-          'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-          test.type,
-          test.expectation
-        ]);
+        return player[test.action](test.value)
+          .then(() => {
+            expect(soap.invoke.firstCall.args, test.action).eql([
+              'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+              test.type,
+              test.expectation
+            ]);
+          });
       });
     });
 
     it('clearQueue', () => {
       expect(TYPE.RemoveAllTracksFromQueue).not.undefined;
-      expect(player.clearQueue()).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.RemoveAllTracksFromQueue
-      ]);
+      return player.clearQueue()
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.RemoveAllTracksFromQueue
+          ]);
+        });
     });
 
     it('removeTrackFromQueue', () => {
       expect(TYPE.RemoveTrackFromQueue).not.undefined;
-      expect(player.removeTrackFromQueue(13)).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.RemoveTrackFromQueue,
-        { track: 13 }
-      ]);
+      return player.removeTrackFromQueue(13)
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.RemoveTrackFromQueue,
+            { track: 13 }
+          ]);
+        });
     });
 
     describe('Playmode dependant tests', () => {
-
-      beforeEach(() => {
-        soap.invoke = sinon.stub().resolves();
-      });
 
       it('Repeat with no state', () => {
         expect(TYPE.SetPlayMode).not.undefined;
@@ -441,86 +452,117 @@ describe('Player', () => {
           });
       });
 
+      describe('when playmode fails', () => {
+
+        beforeEach(() => {
+          soap.invoke.onCall(0).rejects();
+        });
+
+        it('Still calls crossfade if playmode fails', () => {
+          return player.setPlayMode({ repeat: false, crossfade: true })
+            .then(() => {
+              expect(soap.invoke).calledTwice;
+            });
+        });
+      });
+
     });
 
     it('Sleep', () => {
       expect(TYPE.ConfigureSleepTimer).not.undefined;
-      expect(player.sleep(120)).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.ConfigureSleepTimer,
-        { time: '00:02:00' }
-      ]);
+      return player.sleep(120)
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.ConfigureSleepTimer,
+            { time: '00:02:00' }
+          ]);
+        });
     });
 
     it('setAVTransport', () => {
       expect(TYPE.SetAVTransportURI).not.undefined;
-      expect(player.setAVTransport('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.SetAVTransportURI,
-        {
-          uri: 'x-rincon:RINCON_00000000000001400',
-          metadata: '&lt;DIDL-Lite&gt;&lt;/DIDL-Lite&gt;'
-        }
-      ]);
+      return player.setAVTransport('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.SetAVTransportURI,
+            {
+              uri: 'x-rincon:RINCON_00000000000001400',
+              metadata: '&lt;DIDL-Lite&gt;&lt;/DIDL-Lite&gt;'
+            }
+          ]);
+        });
     });
 
     it('setAVTransport without metadata', () => {
       expect(TYPE.SetAVTransportURI).not.undefined;
-      expect(player.setAVTransport('x-rincon:RINCON_00000000000001400')).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.SetAVTransportURI,
-        {
-          uri: 'x-rincon:RINCON_00000000000001400',
-          metadata: ''
-        }
-      ]);
+      return player.setAVTransport('x-rincon:RINCON_00000000000001400')
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.SetAVTransportURI,
+            {
+              uri: 'x-rincon:RINCON_00000000000001400',
+              metadata: ''
+            }
+          ]);
+        });
     });
 
     it('becomeCoordinatorOfStandaloneGroup', () => {
       expect(TYPE.BecomeCoordinatorOfStandaloneGroup).not.undefined;
-      expect(player.becomeCoordinatorOfStandaloneGroup()).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.BecomeCoordinatorOfStandaloneGroup
-      ]);
+      return player.becomeCoordinatorOfStandaloneGroup()
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.BecomeCoordinatorOfStandaloneGroup
+          ]);
+        });
     });
 
     it('refreshShareIndex', () => {
       expect(TYPE.RefreshShareIndex).not.undefined;
-      expect(player.refreshShareIndex()).equal('promise');
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
-        TYPE.RefreshShareIndex
-      ]);
+      return player.refreshShareIndex()
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
+            TYPE.RefreshShareIndex
+          ]);
+        });
     });
 
     it('addURIToQueue', () => {
+      soap.parse.restore();
       let addURIToQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToQueue.xml`);
       addURIToQueueXml.statusCode = 200;
       soap.invoke.resolves(addURIToQueueXml);
 
       expect(TYPE.AddURIToQueue).not.undefined;
-      expect(player.addURIToQueue('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')).eql({});
-      expect(soap.invoke).calledOnce;
-      expect(soap.invoke.firstCall.args).eql([
-        'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-        TYPE.AddURIToQueue,
-        {
-          uri: 'x-rincon:RINCON_00000000000001400',
-          metadata: '&lt;DIDL-Lite&gt;&lt;/DIDL-Lite&gt;',
-          enqueueAsNext: 0,
-          desiredFirstTrackNumberEnqueued: 0
-        }
-      ]);
+      return player.addURIToQueue('x-rincon:RINCON_00000000000001400', '<DIDL-Lite></DIDL-Lite>')
+        .then((result) => {
+          expect(result).eql({
+            firsttracknumberenqueued: '1',
+            newqueuelength: '1',
+            numtracksadded: '1'
+          });
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.AddURIToQueue,
+            {
+              uri: 'x-rincon:RINCON_00000000000001400',
+              metadata: '&lt;DIDL-Lite&gt;&lt;/DIDL-Lite&gt;',
+              enqueueAsNext: 0,
+              desiredFirstTrackNumberEnqueued: 0
+            }
+          ]);
+        });
     });
   });
 
   describe('Position of track progress should be fetched', () => {
     beforeEach((done) => {
-      soap.invoke.resolves();
       player.on('transport-state', () => {
         done();
       });
@@ -542,6 +584,10 @@ describe('Player', () => {
   describe('Using fake timers', () => {
     let clock;
     let now;
+
+    beforeEach('We need parse functionality here', () => {
+      soap.parse.restore();
+    });
 
     beforeEach((done) => {
       let positionXml = fs.createReadStream(`${__dirname}/../../data/getpositioninfo.xml`);
@@ -579,12 +625,17 @@ describe('Player', () => {
   });
 
   describe('Browse-inherited functions', () => {
+
+    beforeEach('We need parse functionality here', () => {
+      soap.parse.restore();
+    });
+
     describe('Return queue', () => {
       let queue;
       beforeEach(() => {
         let queueStream = fs.createReadStream(path.join(__dirname, '../../data/queue.xml'));
 
-        soap.invoke.returns(Promise.resolve(queueStream));
+        soap.invoke.resolves(queueStream);
 
         return player.getQueue()
           .then((q) => {
@@ -619,7 +670,7 @@ describe('Player', () => {
       beforeEach(() => {
         let queueStream = fs.createReadStream(path.join(__dirname, '../../data/playlists.xml'));
 
-        soap.invoke.returns(Promise.resolve(queueStream));
+        soap.invoke.resolves(queueStream);
 
         return player.browse()
           .then((q) => {
