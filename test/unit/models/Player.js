@@ -686,6 +686,7 @@ describe('Player', () => {
         expect(queue.items[0]).eql({
           uri: 'file:///jffs/settings/savedqueues.rsq#2',
           title: 'Morgon',
+          artist: undefined,
           albumArtUri: [
             '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a35N1AduT1LDo3deLfYniTY%3fsid%3d9%26flags%3d0',
             '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a1MQYow43CGLYMECVSjTpCM%3fsid%3d9%26flags%3d0',
