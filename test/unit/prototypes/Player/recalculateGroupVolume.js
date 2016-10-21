@@ -15,7 +15,8 @@ describe('Player.calculateGroupVolume', () => {
       uuid: '123456789',
       groupState: {
         volume: 10
-      }
+      },
+      emit: sinon.spy()
     };
 
     players = [{
