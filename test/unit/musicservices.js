@@ -21,7 +21,7 @@ describe('MusicServices', function () {
       });
   });
 
-  it('should return cover art on existing service', () => {
+  xit('should return cover art on existing service', () => {
     let uri = 'x-sonos-http:track%3a44731098.mp3?sid=160&flags=8224&sn=10';
     return musicServices.tryGetHighResArt(uri)
     .then((url) => {

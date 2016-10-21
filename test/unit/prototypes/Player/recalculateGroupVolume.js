@@ -69,4 +69,16 @@ describe('Player.calculateGroupVolume', () => {
     });
 
   });
+
+  describe('When all players has outputFixed = true', () => {
+
+    beforeEach(() => {
+      players.forEach(player => player.outputFixed = true);
+    });
+
+    it('should not have updated groupState.volume', () => {
+      expect(coordinator.groupState.volume).equal(10);
+    });
+
+  });
 });

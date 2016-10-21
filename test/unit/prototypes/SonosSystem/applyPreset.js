@@ -8,13 +8,14 @@ describe('SonosSystem.applyPreset', () => {
 
   describe('When applying a preset', () => {
     let system;
-    let player;
+    let coordinator;
+    let member;
     let preset;
     let superfluousPlayer;
     let otherPlayer;
 
     before(() => {
-      player = {
+      coordinator = {
         roomName: 'Kitchen',
         play: sinon.stub().resolves(),
         setVolume: sinon.stub().resolves(),
@@ -29,35 +30,58 @@ describe('SonosSystem.applyPreset', () => {
         uuid: 'RINCON_0000000001400'
       };
 
+      member = {
+        roomName: 'Member',
+        play: sinon.stub().resolves(),
+        setVolume: sinon.stub().resolves(),
+        pause: sinon.stub().resolves(),
+        setAVTransport: sinon.stub().resolves(),
+        replaceWithFavorite: sinon.stub().resolves(),
+        setPlayMode: sinon.stub().resolves(),
+        trackSeek: sinon.stub().resolves(),
+        timeSeek: sinon.stub().resolves(),
+        sleep: sinon.stub().resolves(),
+        becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
+        uuid: 'RINCON_0100000001400'
+      };
+
       otherPlayer = {
         roomName: 'Other room',
         pause: sinon.stub().resolves(),
         uuid: 'RINCON_1000000001400'
       };
 
-      player.coordinator = player;
+      coordinator.coordinator = coordinator;
+      member.coordinator = coordinator;
 
       superfluousPlayer = {
         becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves()
       };
 
       system = {
-        getPlayer: sinon.stub().returns(player),
+        getPlayer: sinon.stub(),
         zones: [
           {
             uuid: 'RINCON_0000000001400',
-            coordinator: player,
+            coordinator: coordinator,
             members: [
-              player, player, player, superfluousPlayer
+              coordinator, member, superfluousPlayer
             ]
           },
-          { coordinator: otherPlayer }
+          {
+            coordinator: otherPlayer,
+            uuid: 'RINCON_1000000001400'
+          }
         ]
       };
 
+      system.getPlayer.withArgs('Kitchen').returns(coordinator);
+      system.getPlayer.withArgs('Other room').returns(member);
+      system.getPlayer.withArgs('Office').returns(member);
+
       preset = {
         test: {
-          players: [{ roomName: 'Bedroom', volume: 1 }, { roomName: 'Kitchen', volume: 2 }, {
+          players: [{ roomName: 'Kitchen', volume: 1 }, { roomName: 'Other room', volume: 2 }, {
             roomName: 'Office',
             volume: 3
           }],
@@ -79,6 +103,7 @@ describe('SonosSystem.applyPreset', () => {
     });
 
     it('Pauses all zones', () => {
+      expect(coordinator.pause).not.called;
       expect(otherPlayer.pause).calledOnce;
     });
 
@@ -89,20 +114,21 @@ describe('SonosSystem.applyPreset', () => {
     });
 
     it('Has set volume correctly', () => {
-      expect(player.setVolume).calletThrice;
-      expect(player.setVolume.firstCall.args[0]).equal(1);
-      expect(player.setVolume.secondCall.args[0]).equal(2);
-      expect(player.setVolume.thirdCall.args[0]).equal(3);
+      expect(coordinator.setVolume).calledOnce;
+      expect(coordinator.setVolume.firstCall.args[0]).equal(1);
+      expect(member.setVolume).calledTwice;
+      expect(member.setVolume.firstCall.args[0]).equal(2);
+      expect(member.setVolume.secondCall.args[0]).equal(3);
     });
 
     it('Should not break out coordinator since already coordinator', () => {
-      expect(player.becomeCoordinatorOfStandaloneGroup).not.called;
+      expect(coordinator.becomeCoordinatorOfStandaloneGroup).not.called;
     });
 
     it('Groups players with coordinator', () => {
-      expect(player.setAVTransport).calledTwice;
-      expect(player.setAVTransport.firstCall.args[0]).equal('x-rincon:RINCON_0000000001400');
-      expect(player.setAVTransport.secondCall.args[0]).equal('x-rincon:RINCON_0000000001400');
+      expect(member.setAVTransport).calledTwice;
+      expect(member.setAVTransport.firstCall.args[0]).equal('x-rincon:RINCON_0000000001400');
+      expect(member.setAVTransport.secondCall.args[0]).equal('x-rincon:RINCON_0000000001400');
     });
 
     it('Ungroups players that does\'nt belong to group', () => {
@@ -110,32 +136,32 @@ describe('SonosSystem.applyPreset', () => {
     });
 
     it('Replaces queue with favorite', () => {
-      expect(player.replaceWithFavorite).calledOnce;
-      expect(player.replaceWithFavorite.firstCall.args[0]).equal(preset.test.favorite);
+      expect(coordinator.replaceWithFavorite).calledOnce;
+      expect(coordinator.replaceWithFavorite.firstCall.args[0]).equal(preset.test.favorite);
     });
 
     it('Sets correct playmode', () => {
-      expect(player.setPlayMode).calledOnce;
-      expect(player.setPlayMode.firstCall.args[0]).eql(preset.test.playMode);
+      expect(coordinator.setPlayMode).calledOnce;
+      expect(coordinator.setPlayMode.firstCall.args[0]).eql(preset.test.playMode);
     });
 
     it('Skips to correct track', () => {
-      expect(player.trackSeek).calledOnce;
-      expect(player.trackSeek.firstCall.args[0]).equal(preset.test.trackNo);
+      expect(coordinator.trackSeek).calledOnce;
+      expect(coordinator.trackSeek.firstCall.args[0]).equal(preset.test.trackNo);
     });
 
     it('Skips to correct time', () => {
-      expect(player.timeSeek).calledOnce;
-      expect(player.timeSeek.firstCall.args[0]).equal(preset.test.elapsedTime);
+      expect(coordinator.timeSeek).calledOnce;
+      expect(coordinator.timeSeek.firstCall.args[0]).equal(preset.test.elapsedTime);
     });
 
     it('Should call sleep', () => {
-      expect(player.sleep).calledOnce;
-      expect(player.sleep.firstCall.args[0]).equal(preset.test.sleep);
+      expect(coordinator.sleep).calledOnce;
+      expect(coordinator.sleep.firstCall.args[0]).equal(preset.test.sleep);
     });
 
     it('Should start playback', () => {
-      expect(player.play).calledOnce;
+      expect(coordinator.play).calledOnce;
     });
 
   });
@@ -158,7 +184,8 @@ describe('SonosSystem.applyPreset', () => {
         setVolume: sinon.stub().resolves(),
         becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
         uuid: 'RINCON_10000000001400',
-        coordinator: player
+        coordinator: player,
+        pause: sinon.stub().resolves()
       };
 
       system = {
@@ -186,13 +213,17 @@ describe('SonosSystem.applyPreset', () => {
     it('Detaches first player from group', () => {
       expect(coordinator.becomeCoordinatorOfStandaloneGroup).calledOnce;
     });
+
+    it('Should not pause the coordinator', () => {
+      expect(coordinator.pause).not.called;
+    });
+
   });
 
   describe('When preset contains uri only', () => {
     let system;
     let player;
     let preset;
-    let coordinator;
 
     before(() => {
       player = {
@@ -202,10 +233,12 @@ describe('SonosSystem.applyPreset', () => {
         uuid: 'RINCON_0000000001400'
       };
 
+      player.coordinator = player;
+
       system = {
         getPlayer: sinon.stub().returns(player),
         zones: [
-          { uuid: 'RINCON_0000000001400', coordinator: player }
+          { uuid: 'RINCON_0000000001400', coordinator: player, members: [player] }
         ]
       };
 
