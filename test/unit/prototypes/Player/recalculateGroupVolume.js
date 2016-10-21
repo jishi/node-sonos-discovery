@@ -53,7 +53,8 @@ describe('Player.calculateGroupVolume', () => {
           uuid: coordinator.uuid,
           members: players
         }
-      ]
+      ],
+      emit: sinon.spy()
     };
 
     coordinator.system = system;
