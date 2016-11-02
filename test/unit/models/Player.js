@@ -147,7 +147,8 @@ describe('Player', () => {
         absoluteAlbumArtUri: 'http://example.org/image1',
         duration: 318,
         uri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
-        type: 'track'
+        type: 'track',
+        stationName: '',
       });
       expect(player.state.nextTrack).eql({
         artist: 'Coheed and Cambria',
@@ -176,6 +177,10 @@ describe('Player', () => {
   });
 
   describe('When it recieves a transport-state update for radio playback', () => {
+    beforeEach(() => {
+      musicServices.tryGetHighResArt.onCall(0).rejects();
+    });
+
     beforeEach((done) => {
       let lastChange = require('../../data/avtransportlastchange_radio.json');
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
@@ -188,9 +193,10 @@ describe('Player', () => {
       expect(player.state.playbackState).equals('PLAYING');
       expect(player.state.trackNo).equals(1);
       expect(player.state.currentTrack).eql({
-        artist: 'Lugna Favoriter',
+        stationName: 'Lugna Favoriter',
         title: 'Leona Lewis - Bleeding Love',
         album: undefined,
+        artist: 'Lugna Favoriter',
         albumArtUri: '/getaa?s=1&u=x-sonosapi-stream%3as17553%3fsid%3d254%26flags%3d8224%26sn%3d0',
         absoluteAlbumArtUri: 'http://192.168.1.151:1400/getaa?s=1&u=x-sonosapi-stream%3as17553%3fsid%3d254%26flags%3d8224%26sn%3d0',
         duration: 0,
@@ -218,6 +224,11 @@ describe('Player', () => {
   });
 
   describe('When radio already has an absolute url', () => {
+
+    beforeEach(() => {
+      musicServices.tryGetHighResArt.onCall(0).rejects();
+    });
+
     beforeEach((done) => {
       soap.invoke.resolves();
       let lastChange = require('../../data/avtransportlastchange_radio.json');
@@ -587,6 +598,10 @@ describe('Player', () => {
 
     beforeEach('We need parse functionality here', () => {
       soap.parse.restore();
+    });
+
+    beforeEach(() => {
+      musicServices.tryGetHighResArt.rejects();
     });
 
     beforeEach((done) => {
