@@ -176,7 +176,7 @@ describe('Player', () => {
     });
   });
 
-  describe('When it recieves a transport-state update for radio playback', () => {
+  describe('When it receives a transport-state update for radio playback', () => {
     beforeEach(() => {
       musicServices.tryGetHighResArt.onCall(0).rejects();
     });
@@ -220,6 +220,17 @@ describe('Player', () => {
 
     it('Updates avTransportUriMetadata', () => {
       expect(player.avTransportUriMetadata).equals('<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"><item id="-1" parentID="-1" restricted="true"><dc:title>Lugna Favoriter</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">SA_RINCON65031_</desc></item></DIDL-Lite>');
+    });
+  });
+
+  describe('When it receives a transport-state update for google music when casting', () => {
+
+    it('Doesn\'t crash while casting google music', (done) => {
+      let lastChange = require('../../data/avtransportlastchange_google_cast.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      player.on('transport-state', () => {
+        done();
+      });
     });
   });
 
