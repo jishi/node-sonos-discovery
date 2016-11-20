@@ -7,6 +7,7 @@ require('chai').use(require('sinon-chai'));
 
 describe('request', () => {
   let http;
+  let https;
   let request;
   let client;
   let mockedStream;
@@ -18,11 +19,18 @@ describe('request', () => {
       write: sinon.spy(),
       setTimeout: sinon.spy()
     };
+
     http = {
       request: sinon.stub().returns(client)
     };
+
+    https = {
+      request: sinon.stub().returns(client)
+    };
+
     request = proxyquire('../../../lib/helpers/request', {
-      http
+      http,
+      https
     });
 
     mockedStream = new Readable();
@@ -43,6 +51,27 @@ describe('request', () => {
 
     expect(http.request).calledOnce;
     expect(http.request.firstCall.args[0]).eql({
+      method: 'SUBSCRIBE',
+      path: '/path',
+      host: '127.0.0.1',
+      port: 1400,
+      headers: {
+        'Content-Type': 'text/xml'
+      }
+    });
+  });
+
+  it('Uses https if called with https url', () => {
+    request({
+      uri: 'https://127.0.0.1:1400/path',
+      method: 'SUBSCRIBE',
+      headers: {
+        'Content-Type': 'text/xml'
+      }
+    });
+
+    expect(https.request).calledOnce;
+    expect(https.request.firstCall.args[0]).eql({
       method: 'SUBSCRIBE',
       path: '/path',
       host: '127.0.0.1',
