@@ -14,6 +14,7 @@ describe('Sonos-SSDP', function () {
     socket = {
       bind: sinon.spy(),
       setMulticastTTL: sinon.spy(),
+      setBroadcast: sinon.spy(),
       close: sinon.spy(),
       send: sinon.spy(),
       on: sinon.spy()
@@ -58,7 +59,7 @@ describe('Sonos-SSDP', function () {
     expect(socket.send).calledOnce;
     expect(socket.send.firstCall.args[0].toString()).contains('M-SEARCH');
     expect(socket.send.firstCall.args[3]).equals(1900);
-    expect(socket.send.firstCall.args[4]).equals('239.255.255.250');
+    expect(socket.send.firstCall.args[4]).equals('255.255.255.255');
   });
 
   it('Sends M-SEARCH periodically if no response', (done) => {
