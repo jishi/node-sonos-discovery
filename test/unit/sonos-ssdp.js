@@ -14,6 +14,7 @@ describe('Sonos-SSDP', function () {
     socket = {
       bind: sinon.spy(),
       setMulticastTTL: sinon.spy(),
+      setBroadcast: sinon.spy(),
       close: sinon.spy(),
       send: sinon.spy(),
       on: sinon.spy()
@@ -48,6 +49,7 @@ describe('Sonos-SSDP', function () {
     // trigger the callback on bind
     socket.bind.yield();
     expect(socket.setMulticastTTL).calledWith(2);
+    expect(socket.setBroadcast).calledWith(true);
   });
 
   it('Sends M-SEARCH data once started', () => {
@@ -67,6 +69,7 @@ describe('Sonos-SSDP', function () {
 
     setTimeout(() => {
       expect(socket.send).calledTwice;
+      expect(socket.send.secondCall.args[4]).equals('255.255.255.255');
       done();
     }, 1500);
   });
