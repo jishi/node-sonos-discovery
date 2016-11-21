@@ -215,11 +215,55 @@ describe('Player', () => {
     });
 
     it('Updates avTransportUri', () => {
-      expect(player.avTransportUri).equals('x-sonosapi-stream:s17553?sid=254&amp;flags=8224&amp;sn=0');
+      expect(player.avTransportUri).equals('x-sonosapi-stream:s17553?sid=254&flags=8224&sn=0');
     });
 
     it('Updates avTransportUriMetadata', () => {
       expect(player.avTransportUriMetadata).equals('<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"><item id="-1" parentID="-1" restricted="true"><dc:title>Lugna Favoriter</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">SA_RINCON65031_</desc></item></DIDL-Lite>');
+    });
+  });
+
+  describe('When it receives a transport-state update for custom radio playback', () => {
+    beforeEach(() => {
+      musicServices.tryGetHighResArt.onCall(0).rejects();
+    });
+
+    beforeEach((done) => {
+      let lastChange = require('../../data/avtransportlastchange_custom_radio.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      player.on('transport-state', () => {
+        done();
+      });
+    });
+
+    it('Updates state', () => {
+      expect(player.state.currentTrack).eql({
+        stationName: 'buddha',
+        title: 'Orelha Negra - M.I.R.I.A.M.',
+        album: undefined,
+        artist: 'buddha',
+        albumArtUri: undefined,
+        duration: 0,
+        uri: 'x-rincon-mp3radio://sc01.scahw.com.au:80/buddha_32',
+        type: 'radio'
+      });
+
+      expect(player.state.nextTrack).eql({
+        artist: '',
+        title: '',
+        album: '',
+        albumArtUri: '',
+        duration: 0,
+        uri: ''
+      });
+    });
+
+    it('Updates avTransportUri', () => {
+      expect(player.avTransportUri).equals('x-rincon-mp3radio://sc01.scahw.com.au:80/buddha_32');
+    });
+
+    it('Updates avTransportUriMetadata', () => {
+      expect(player.avTransportUriMetadata).equals('<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" xmlns:r="urn:schemas-rinconnetworks-com:metadata-1-0/" xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"><item id="R:0/0/60" parentID="R:0/0" restricted="true"><dc:title>buddha</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">SA_RINCON65031_</desc></item></DIDL-Lite>');
     });
   });
 
