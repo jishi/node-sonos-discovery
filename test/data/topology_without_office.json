@@ -1,0 +1,131 @@
+[
+  {
+    "$name": "zonegroup",
+    "$attrs": {
+      "coordinator": "RINCON_00000000000001400",
+      "id": "RINCON_00000000000001400:0"
+    },
+    "zonegroupmember": {
+      "uuid": "RINCON_00000000000001400",
+      "location": "http://192.168.1.150:1400/xml/device_description.xml",
+      "zonename": "BOOST",
+      "icon": "x-rincon-roomicon:viper",
+      "configuration": "1",
+      "invisible": "1",
+      "iszonebridge": "1",
+      "softwareversion": "31.8-24090",
+      "mincompatibleversion": "29.0-00000",
+      "legacycompatibleversion": "24.0-00000",
+      "bootseq": "43",
+      "wirelessmode": "0",
+      "hasconfiguredssid": "0",
+      "channelfreq": "2412",
+      "behindwifiextender": "0",
+      "wifienabled": "1",
+      "orientation": "-1",
+      "sonarstate": "0"
+    }
+  },
+  {
+    "$name": "zonegroup",
+    "$attrs": {
+      "coordinator": "RINCON_00000000000301400",
+      "id": "RINCON_00000000000301400:66"
+    },
+    "zonegroupmember": [
+      {
+        "uuid": "RINCON_10000000000001400",
+        "location": "http://192.168.1.155:1400/xml/device_description.xml",
+        "zonename": "TV Room",
+        "icon": "x-rincon-roomicon:tvroom",
+        "configuration": "1",
+        "invisible": "1",
+        "softwareversion": "31.8-24090",
+        "mincompatibleversion": "29.0-00000",
+        "legacycompatibleversion": "24.0-00000",
+        "channelmapset": "RINCON_20000000000001400:LF,RF;RINCON_10000000000001400:SW,SW",
+        "bootseq": "21",
+        "wirelessmode": "0",
+        "hasconfiguredssid": "0",
+        "channelfreq": "2412",
+        "behindwifiextender": "0",
+        "wifienabled": "1",
+        "orientation": "0",
+        "sonarstate": "4"
+      },
+      {
+        "uuid": "RINCON_00000000000101400",
+        "location": "http://192.168.1.151:1400/xml/device_description.xml",
+        "zonename": "Kitchen",
+        "icon": "x-rincon-roomicon:kitchen",
+        "configuration": "1",
+        "softwareversion": "31.8-24090",
+        "mincompatibleversion": "29.0-00000",
+        "legacycompatibleversion": "24.0-00000",
+        "bootseq": "114",
+        "wirelessmode": "0",
+        "hasconfiguredssid": "0",
+        "channelfreq": "2412",
+        "behindwifiextender": "0",
+        "wifienabled": "1",
+        "orientation": "0",
+        "sonarstate": "4"
+      },
+      {
+        "uuid": "RINCON_00000000000201400",
+        "location": "http://192.168.1.153:1400/xml/device_description.xml",
+        "zonename": "Bedroom",
+        "icon": "x-rincon-roomicon:bedroom",
+        "configuration": "1",
+        "softwareversion": "31.8-24090",
+        "mincompatibleversion": "29.0-00000",
+        "legacycompatibleversion": "24.0-00000",
+        "bootseq": "111",
+        "wirelessmode": "0",
+        "hasconfiguredssid": "0",
+        "channelfreq": "2412",
+        "behindwifiextender": "0",
+        "wifienabled": "1",
+        "orientation": "0",
+        "sonarstate": "4"
+      },
+      {
+        "uuid": "RINCON_20000000000001400",
+        "location": "http://192.168.1.154:1400/xml/device_description.xml",
+        "zonename": "TV Room",
+        "icon": "x-rincon-roomicon:tvroom",
+        "configuration": "1",
+        "softwareversion": "31.8-24090",
+        "mincompatibleversion": "29.0-00000",
+        "legacycompatibleversion": "24.0-00000",
+        "channelmapset": "RINCON_20000000000001400:LF,RF;RINCON_10000000000001400:SW,SW",
+        "bootseq": "113",
+        "wirelessmode": "0",
+        "hasconfiguredssid": "0",
+        "channelfreq": "2412",
+        "behindwifiextender": "0",
+        "wifienabled": "1",
+        "orientation": "0",
+        "sonarstate": "4"
+      },
+      {
+        "uuid": "RINCON_00000000000301400",
+        "location": "http://192.168.1.157:1400/xml/device_description.xml",
+        "zonename": "Bathroom",
+        "icon": "x-rincon-roomicon:bathroom",
+        "configuration": "1",
+        "softwareversion": "31.8-24090",
+        "mincompatibleversion": "29.0-00000",
+        "legacycompatibleversion": "24.0-00000",
+        "bootseq": "44",
+        "wirelessmode": "0",
+        "hasconfiguredssid": "0",
+        "channelfreq": "2412",
+        "behindwifiextender": "0",
+        "wifienabled": "1",
+        "orientation": "0",
+        "sonarstate": "4"
+      }
+    ]
+  }
+]

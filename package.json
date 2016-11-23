@@ -1,6 +1,6 @@
 {
   "name": "sonos-discovery",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "A simple node library for managing your Sonos system",
   "author": "Jimmy Shimizu <jimmy@shimizu.se>",
   "repository": {
@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "html-entities": "1.0.x",
-    "request-promise": "^1.0.2",
     "xml-flow": "^1.0.1"
   },
   "devDependencies": {

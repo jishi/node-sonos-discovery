@@ -16,6 +16,7 @@ describe('SonosSystem', () => {
   let NotificationListener;
   let listener;
   let Subscriber;
+  let subscriber;
   let Player;
   let Sub;
 
@@ -23,7 +24,7 @@ describe('SonosSystem', () => {
     ssdp = {
       start: sinon.spy(),
       stop: sinon.spy(),
-      on: sinon.spy()
+      once: sinon.spy()
     };
 
     request = sinon.stub();
@@ -44,7 +45,11 @@ describe('SonosSystem', () => {
 
     NotificationListener = sinon.stub().returns(listener);
 
-    Subscriber = sinon.spy();
+    subscriber = {
+      once: sinon.spy(),
+      dispose: sinon.spy()
+    };
+    Subscriber = sinon.stub().returns(subscriber);
 
     Player = sinon.spy(proxyquire('../../lib/models/Player', {
       '../Subscriber': Subscriber
@@ -88,7 +93,7 @@ describe('SonosSystem', () => {
   describe('when topology is done', () => {
 
     beforeEach((done) => {
-      ssdp.on.yield({
+      ssdp.once.yield({
         ip: '127.0.0.1',
         location: 'http://127.0.0.1:1400/xml',
         household: 'Sonos_1234567890abcdef'
@@ -120,6 +125,19 @@ describe('SonosSystem', () => {
         'http://127.0.0.1:1400/ZoneGroupTopology/Event',
         'http://127.0.0.2:3500/'
       ]);
+
+    });
+
+    describe('If Subscriber errors out', () => {
+
+      beforeEach(() => {
+        subscriber.once.withArgs('dead').yield('Mocked error');
+      });
+
+      it('Should restart discovery', () => {
+        expect(subscriber.dispose).calledOnce;
+        expect(ssdp.start).calledTwice;
+      });
 
     });
 
@@ -223,6 +241,19 @@ describe('SonosSystem', () => {
         it('Throws error on unknown service', () => {
           expect(sonos.getServiceId.bind(sonos, 'UNKNOWN SERVICE')).to.throw(UnknownServiceError);
           expect(sonos.getServiceType.bind(sonos, 'UNKNOWN SERVICE')).to.throw(UnknownServiceError);
+        });
+
+        describe('When a new topology with removed players emits', () => {
+
+          beforeEach(() => {
+            const topology = require('../data/topology_without_office.json');
+            listener.on.withArgs('topology').yield('', topology);
+          });
+
+          it('Should no longer have Office left', () => {
+            const player = sonos.getPlayer('Office');
+            expect(player).to.be.undefined;
+          });
         });
       });
 

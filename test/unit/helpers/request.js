@@ -140,6 +140,23 @@ describe('request', () => {
     return promise;
   });
 
+  it('Resolves promise with deserialized JSON if type=json', () => {
+    let body = '{ "x": 1, "y": "z" }';
+    let promise = request({
+      uri: 'http://127.0.0.1/path',
+      type: 'json'
+    }).then((content) => {
+      expect(content).eql({ x: 1, y: 'z' });
+    });
+
+    http.request.yield(mockedStream);
+
+    mockedStream.push(body);
+    mockedStream.push(null);
+
+    return promise;
+  });
+
   it('Rejects if error occur', () => {
     let promise = request({
       uri: 'http://127.0.0.1/path'
@@ -189,7 +206,7 @@ describe('request', () => {
   it('Returns response object if stream=true', () => {
     let promise = request({
       uri: 'http://127.0.0.1/path',
-      stream: true
+      type: 'stream'
     }).then((res) => {
       expect(res).equal(mockedStream);
     });

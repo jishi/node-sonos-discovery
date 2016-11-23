@@ -30,7 +30,7 @@ describe('Subscriber', () => {
         NT: 'upnp:event',
         TIMEOUT: 'Second-600'
       },
-      stream: true
+      type: 'stream'
     });
   });
 
@@ -45,7 +45,7 @@ describe('Subscriber', () => {
       expect(request.secondCall.args[0]).eql({
         uri: 'http://192.168.1.151:1400/test/path',
         method: 'SUBSCRIBE',
-        stream: true,
+        type: 'stream',
         headers: {
           CALLBACK: '<http://127.0.0.2/>',
           NT: 'upnp:event',
@@ -72,7 +72,7 @@ describe('Subscriber', () => {
       expect(request.secondCall.args[0]).eql({
         uri: 'http://192.168.1.151:1400/test/path',
         method: 'SUBSCRIBE',
-        stream: true,
+        type: 'stream',
         headers: {
           TIMEOUT: 'Second-0.1',
           SID: '12345678'
@@ -82,7 +82,7 @@ describe('Subscriber', () => {
       expect(request.thirdCall.args[0]).eql({
         uri: 'http://192.168.1.151:1400/test/path',
         method: 'SUBSCRIBE',
-        stream: true,
+        type: 'stream',
         headers: {
           CALLBACK: '<http://127.0.0.2/>',
           NT: 'upnp:event',
@@ -107,7 +107,7 @@ describe('Subscriber', () => {
       expect(request.secondCall.args[0]).eql({
         uri: 'http://192.168.1.151:1400/test/path',
         method: 'SUBSCRIBE',
-        stream: true,
+        type: 'stream',
         headers: {
           TIMEOUT: 'Second-0.1',
           SID: '1234567890'
@@ -131,7 +131,7 @@ describe('Subscriber', () => {
       expect(request).calledTwice;
       expect(request.secondCall.args[0]).eql({
         method: 'UNSUBSCRIBE',
-        stream: true,
+        type: 'stream',
         uri: 'http://192.168.1.151:1400/test/path',
         headers: {
           SID: '1234567890'
@@ -157,6 +157,25 @@ describe('Subscriber', () => {
       expect(request).calledTwice;
       done();
     }, 90);
+  });
+
+  describe('When request fails 5 consecutive times', () => {
+    let errorCallback = sinon.spy();
+
+    beforeEach(() => {
+      request.rejects();
+    });
+
+    beforeEach((done) => {
+      const subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1, 100);
+      subscriber.once('dead', errorCallback);
+      setTimeout(done, 500);
+    });
+
+    it('Emits error if rejected too many times', () => {
+      expect(errorCallback).calledOnce;
+    });
+
   });
 })
 ;
