@@ -181,10 +181,10 @@ describe('request', () => {
       expect(e.statusCode).equals(500);
     });
 
-    http.request.yield({
-      statusCode: 500,
-      statusMessage: 'This is an error'
-    });
+    mockedStream.statusCode = 500;
+    mockedStream.statusMessage = 'This is an error';
+    http.request.yield(mockedStream);
+    mockedStream.push(null);
 
     return promise;
   });

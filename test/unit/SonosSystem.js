@@ -71,26 +71,215 @@ describe('SonosSystem', () => {
     });
   });
 
-  beforeEach(() => {
-    sonos = new SonosSystem();
-  });
-
   afterEach(() => {
     soap.invoke.restore();
   });
 
-  it('Loaded prototypes', () => {
-    expect(SonosSystem).respondTo('applyPreset');
-    expect(SonosSystem).respondTo('getFavorites');
-    expect(SonosSystem).respondTo('getPlaylists');
-    expect(SonosSystem).respondTo('refreshShareIndex');
+  describe('When no settings are provided', () => {
+    beforeEach(() => {
+      sonos = new SonosSystem();
+    });
+
+    it('Loaded prototypes', () => {
+      expect(SonosSystem).respondTo('applyPreset');
+      expect(SonosSystem).respondTo('getFavorites');
+      expect(SonosSystem).respondTo('getPlaylists');
+      expect(SonosSystem).respondTo('refreshShareIndex');
+    });
+
+    it('Starts scanning', () => {
+      expect(ssdp.start).calledOnce;
+    });
+
+    describe('when topology is done', () => {
+
+      beforeEach((done) => {
+        ssdp.once.yield({
+          ip: '127.0.0.1',
+          location: 'http://127.0.0.1:1400/xml',
+          household: 'Sonos_1234567890abcdef'
+        });
+
+        setImmediate(() => {
+          done();
+        });
+      });
+
+      beforeEach(() => {
+        listener.on.withArgs('listening').yield();
+      });
+
+      it('Finds local endpoint', () => {
+        expect(request).called;
+        expect(request.firstCall.args[0].method).equals('GET');
+        expect(request.firstCall.args[0].uri).equals('http://127.0.0.1:1400/xml');
+        expect(sonos.localEndpoint).equals('127.0.0.2');
+      });
+
+      it('Starts a NotificationListener', () => {
+        expect(NotificationListener).calledWithNew;
+      });
+
+      it('Subscribes to player when ssdp emits', () => {
+        expect(Subscriber).calledWithNew;
+        expect(Subscriber.firstCall.args).eql([
+          'http://127.0.0.1:1400/ZoneGroupTopology/Event',
+          'http://127.0.0.2:3500/'
+        ]);
+
+      });
+
+      describe('If Subscriber errors out', () => {
+
+        beforeEach(() => {
+          subscriber.once.withArgs('dead').yield('Mocked error');
+        });
+
+        it('Should restart discovery', () => {
+          expect(subscriber.dispose).calledOnce;
+          expect(ssdp.start).calledTwice;
+        });
+
+      });
+
+      describe('topology', () => {
+
+        beforeEach(() => {
+          let topology = require('../data/topology.json');
+          listener.on.withArgs('topology').yield('', topology);
+        });
+
+        it('Populate zones on topology notification', () => {
+          expect(sonos.zones).not.empty;
+          sonos.zones.forEach((zone) => {
+            expect(zone.members).not.empty;
+            zone.members.forEach((member) => {
+              expect(member).instanceOf(Player);
+            });
+          });
+
+          expect(sonos.zones[0].id).equal('RINCON_00000000000301400:66');
+        });
+
+        it('Populate players on topology notification', () => {
+          expect(sonos.players).not.empty;
+          let player = sonos.getPlayer('TV Room');
+          expect(player.roomName).equal('TV Room');
+        });
+
+        it('Do not contain Invisible units', () => {
+          sonos.zones.forEach((zone) => {
+            return zone.members.forEach((member) => {
+              expect(member.roomName).not.equal('BOOST');
+            });
+          });
+        });
+
+        it('Attaches SUB to primary player', () => {
+          sonos.zones.forEach((zone) => {
+            let tvRoom = zone.members.find((member) => member.roomName === 'TV Room');
+            expect(tvRoom).not.undefined;
+            expect(tvRoom.sub).not.undefined;
+            expect(tvRoom.sub.roomName).equal('TV Room (SUB)');
+          });
+        });
+
+        it('Only creates player and sub once', () => {
+          let topology = require('../data/topology.json');
+          listener.on.withArgs('topology').yield('', topology);
+          expect(Player).callCount(5);
+          expect(Sub).calledOnce;
+        });
+
+        it('Links coordinator property on all players', () => {
+          sonos.zones.forEach((zone) => {
+            let coordinatorUuid = zone.uuid;
+            zone.members.forEach((player) => {
+              expect(player.coordinator).instanceOf(Player);
+              expect(player.coordinator.uuid).equal(coordinatorUuid);
+            });
+          });
+        });
+
+        it('Returns player with getPlayer', () => {
+          let player = sonos.getPlayer('Office');
+          expect(player).instanceOf(Player);
+          expect(player.roomName).equals('Office');
+        });
+
+        it('Returns player with getPlayer case insensitive', () => {
+          let player = sonos.getPlayer('officE');
+          expect(player).instanceOf(Player);
+          expect(player.roomName).equals('Office');
+        });
+
+        it('Returns player with getPlayerByUUD', () => {
+          let player = sonos.getPlayerByUUID('RINCON_20000000000001400');
+          expect(player).instanceOf(Player);
+          expect(player.roomName).equals('TV Room');
+        });
+
+        describe('After initialized', () => {
+          beforeEach((done) => {
+            sonos.on('initialized', done);
+          });
+
+          it('Called ListAvailableServices with valid player', () => {
+            expect(soap.invoke).calledOnce;
+            expect(soap.invoke.firstCall.args[0]).equal('http://192.168.1.151:1400/MusicServices/Control');
+          });
+
+          it('Can lookup SID from service name', () => {
+            expect(sonos.getServiceId('Spotify')).to.equal(9);
+            expect(sonos.getServiceId('Apple Music')).to.equal(204);
+          });
+
+          it('Can lookup type from service name', () => {
+            expect(sonos.getServiceType('Spotify')).to.equal(2311);
+            expect(sonos.getServiceType('Apple Music')).to.equal(52231);
+          });
+
+          it('Throws error on unknown service', () => {
+            expect(sonos.getServiceId.bind(sonos, 'UNKNOWN SERVICE')).to.throw(UnknownServiceError);
+            expect(sonos.getServiceType.bind(sonos, 'UNKNOWN SERVICE')).to.throw(UnknownServiceError);
+          });
+
+          describe('When a new topology with removed players emits', () => {
+
+            beforeEach(() => {
+              const topology = require('../data/topology_without_office.json');
+              listener.on.withArgs('topology').yield('', topology);
+            });
+
+            it('Should no longer have Office left', () => {
+              const player = sonos.getPlayer('Office');
+              expect(player).to.be.undefined;
+            });
+          });
+        });
+      });
+    });
   });
 
-  it('Starts scanning', () => {
-    expect(ssdp.start).calledOnce;
-  });
+  describe('When we have household setting', () => {
 
-  describe('when topology is done', () => {
+    beforeEach(() => {
+      request.resolves({
+        socket: {
+          address: function () {
+            return {
+              address: '127.0.0.2'
+            };
+          }
+        }
+      });
+    });
+
+    beforeEach(() => {
+      sonos = new SonosSystem({
+        household: 'Sonos_asdg12335346345'
+      });
+    });
 
     beforeEach((done) => {
       ssdp.once.yield({
@@ -99,164 +288,22 @@ describe('SonosSystem', () => {
         household: 'Sonos_1234567890abcdef'
       });
 
+      ssdp.once.yield({
+        ip: '127.0.0.1',
+        location: 'http://127.0.0.3:1400/xml',
+        household: 'Sonos_asdg12335346345'
+      });
+
       setImmediate(() => {
         done();
       });
     });
 
-    beforeEach(() => {
-      listener.on.withArgs('listening').yield();
-    });
-
-    it('Finds local endpoint', () => {
+    it('Finds the system matching the configured household', () => {
       expect(request).called;
       expect(request.firstCall.args[0].method).equals('GET');
-      expect(request.firstCall.args[0].uri).equals('http://127.0.0.1:1400/xml');
-      expect(sonos.localEndpoint).equals('127.0.0.2');
-    });
-
-    it('Starts a NotificationListener', () => {
-      expect(NotificationListener).calledWithNew;
-    });
-
-    it('Subscribes to player when ssdp emits', () => {
-      expect(Subscriber).calledWithNew;
-      expect(Subscriber.firstCall.args).eql([
-        'http://127.0.0.1:1400/ZoneGroupTopology/Event',
-        'http://127.0.0.2:3500/'
-      ]);
-
-    });
-
-    describe('If Subscriber errors out', () => {
-
-      beforeEach(() => {
-        subscriber.once.withArgs('dead').yield('Mocked error');
-      });
-
-      it('Should restart discovery', () => {
-        expect(subscriber.dispose).calledOnce;
-        expect(ssdp.start).calledTwice;
-      });
-
-    });
-
-    describe('topology', () => {
-
-      beforeEach(() => {
-        let topology = require('../data/topology.json');
-        listener.on.withArgs('topology').yield('', topology);
-      });
-
-      it('Populate zones on topology notification', () => {
-        expect(sonos.zones).not.empty;
-        sonos.zones.forEach((zone) => {
-          expect(zone.members).not.empty;
-          zone.members.forEach((member) => {
-            expect(member).instanceOf(Player);
-          });
-        });
-
-        expect(sonos.zones[0].id).equal('RINCON_00000000000301400:66');
-      });
-
-      it('Populate players on topology notification', () => {
-        expect(sonos.players).not.empty;
-        let player = sonos.getPlayer('TV Room');
-        expect(player.roomName).equal('TV Room');
-      });
-
-      it('Do not contain Invisible units', () => {
-        sonos.zones.forEach((zone) => {
-          return zone.members.forEach((member) => {
-            expect(member.roomName).not.equal('BOOST');
-          });
-        });
-      });
-
-      it('Attaches SUB to primary player', () => {
-        sonos.zones.forEach((zone) => {
-          let tvRoom = zone.members.find((member) => member.roomName === 'TV Room');
-          expect(tvRoom).not.undefined;
-          expect(tvRoom.sub).not.undefined;
-          expect(tvRoom.sub.roomName).equal('TV Room (SUB)');
-        });
-      });
-
-      it('Only creates player and sub once', () => {
-        let topology = require('../data/topology.json');
-        listener.on.withArgs('topology').yield('', topology);
-        expect(Player).callCount(5);
-        expect(Sub).calledOnce;
-      });
-
-      it('Links coordinator property on all players', () => {
-        sonos.zones.forEach((zone) => {
-          let coordinatorUuid = zone.uuid;
-          zone.members.forEach((player) => {
-            expect(player.coordinator).instanceOf(Player);
-            expect(player.coordinator.uuid).equal(coordinatorUuid);
-          });
-        });
-      });
-
-      it('Returns player with getPlayer', () => {
-        let player = sonos.getPlayer('Office');
-        expect(player).instanceOf(Player);
-        expect(player.roomName).equals('Office');
-      });
-
-      it('Returns player with getPlayer case insensitive', () => {
-        let player = sonos.getPlayer('officE');
-        expect(player).instanceOf(Player);
-        expect(player.roomName).equals('Office');
-      });
-
-      it('Returns player with getPlayerByUUD', () => {
-        let player = sonos.getPlayerByUUID('RINCON_20000000000001400');
-        expect(player).instanceOf(Player);
-        expect(player.roomName).equals('TV Room');
-      });
-
-      describe('After initialized', () => {
-        beforeEach((done) => {
-          sonos.on('initialized', done);
-        });
-
-        it('Called ListAvailableServices with valid player', () => {
-          expect(soap.invoke).calledOnce;
-          expect(soap.invoke.firstCall.args[0]).equal('http://192.168.1.151:1400/MusicServices/Control');
-        });
-
-        it('Can lookup SID from service name', () => {
-          expect(sonos.getServiceId('Spotify')).to.equal(9);
-          expect(sonos.getServiceId('Apple Music')).to.equal(204);
-        });
-
-        it('Can lookup type from service name', () => {
-          expect(sonos.getServiceType('Spotify')).to.equal(2311);
-          expect(sonos.getServiceType('Apple Music')).to.equal(52231);
-        });
-
-        it('Throws error on unknown service', () => {
-          expect(sonos.getServiceId.bind(sonos, 'UNKNOWN SERVICE')).to.throw(UnknownServiceError);
-          expect(sonos.getServiceType.bind(sonos, 'UNKNOWN SERVICE')).to.throw(UnknownServiceError);
-        });
-
-        describe('When a new topology with removed players emits', () => {
-
-          beforeEach(() => {
-            const topology = require('../data/topology_without_office.json');
-            listener.on.withArgs('topology').yield('', topology);
-          });
-
-          it('Should no longer have Office left', () => {
-            const player = sonos.getPlayer('Office');
-            expect(player).to.be.undefined;
-          });
-        });
-      });
-
+      expect(request.firstCall.args[0].uri).equals('http://127.0.0.3:1400/xml');
     });
   });
+
 });
