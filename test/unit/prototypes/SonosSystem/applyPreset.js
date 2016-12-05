@@ -14,7 +14,7 @@ describe('SonosSystem.applyPreset', () => {
     let superfluousPlayer;
     let otherPlayer;
 
-    before(() => {
+    beforeEach(() => {
       coordinator = {
         roomName: 'Kitchen',
         play: sinon.stub().resolves(),
@@ -26,6 +26,8 @@ describe('SonosSystem.applyPreset', () => {
         trackSeek: sinon.stub().resolves(),
         timeSeek: sinon.stub().resolves(),
         sleep: sinon.stub().resolves(),
+        mute: sinon.stub().resolves(),
+        unMute: sinon.stub().resolves(),
         becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
         uuid: 'RINCON_0000000001400'
       };
@@ -41,6 +43,8 @@ describe('SonosSystem.applyPreset', () => {
         trackSeek: sinon.stub().resolves(),
         timeSeek: sinon.stub().resolves(),
         sleep: sinon.stub().resolves(),
+        mute: sinon.stub().resolves(),
+        unMute: sinon.stub().resolves(),
         becomeCoordinatorOfStandaloneGroup: sinon.stub().resolves(),
         uuid: 'RINCON_0100000001400'
       };
@@ -80,88 +84,115 @@ describe('SonosSystem.applyPreset', () => {
       system.getPlayer.withArgs('Office').returns(member);
 
       preset = {
-        test: {
-          players: [{ roomName: 'Kitchen', volume: 1 }, { roomName: 'Other room', volume: 2 }, {
-            roomName: 'Office',
-            volume: 3
-          }],
-          playMode: {
-            crossfade: true,
-            repeat: true,
-            shuffle: true
-          },
-          pauseOthers: true,
-          favorite: 'My favorite',
-          trackNo: 12,
-          elapsedTime: 120,
-          state: 'playing',
-          sleep: 600
-        }
+        players: [{ roomName: 'Kitchen', volume: 1 }, { roomName: 'Other room', volume: 2 }, {
+          roomName: 'Office',
+          volume: 3,
+          mute: true
+        }],
+        playMode: {
+          crossfade: true,
+          repeat: true,
+          shuffle: true
+        },
+        pauseOthers: true,
+        favorite: 'My favorite',
+        trackNo: 12,
+        elapsedTime: 120,
+        state: 'playing',
+        sleep: 600
       };
-
-      return applyPreset.call(system, preset.test);
     });
 
-    it('Pauses all zones', () => {
-      expect(coordinator.pause).not.called;
-      expect(otherPlayer.pause).calledOnce;
+    describe('When applying preset', () => {
+
+      beforeEach(() => {
+        return applyPreset.call(system, preset);
+      });
+
+      it('Pauses all zones', () => {
+        expect(coordinator.pause).not.called;
+        expect(otherPlayer.pause).calledOnce;
+      });
+
+      it('Has invoked getPlayer thrice', () => {
+        expect(system.getPlayer.firstCall.args[0]).equal(preset.players[0].roomName);
+        expect(system.getPlayer.secondCall.args[0]).equal(preset.players[1].roomName);
+        expect(system.getPlayer.thirdCall.args[0]).equal(preset.players[2].roomName);
+      });
+
+      it('Has set volume correctly', () => {
+        expect(coordinator.setVolume).calledOnce;
+        expect(coordinator.setVolume.firstCall.args[0]).equal(1);
+        expect(member.setVolume).calledTwice;
+        expect(member.setVolume.firstCall.args[0]).equal(2);
+        expect(member.setVolume.secondCall.args[0]).equal(3);
+      });
+
+      it('Has muted player correctly', () => {
+        expect(member.unMute).not.called;
+        expect(member.mute).calledOnce;
+      });
+
+      it('Should not break out coordinator since already coordinator', () => {
+        expect(coordinator.becomeCoordinatorOfStandaloneGroup).not.called;
+      });
+
+      it('Groups players with coordinator', () => {
+        expect(member.setAVTransport).calledTwice;
+        expect(member.setAVTransport.firstCall.args[0]).equal('x-rincon:RINCON_0000000001400');
+        expect(member.setAVTransport.secondCall.args[0]).equal('x-rincon:RINCON_0000000001400');
+      });
+
+      it('Ungroups players that does\'nt belong to group', () => {
+        expect(superfluousPlayer.becomeCoordinatorOfStandaloneGroup).calledOnce;
+      });
+
+      it('Replaces queue with favorite', () => {
+        expect(coordinator.replaceWithFavorite).calledOnce;
+        expect(coordinator.replaceWithFavorite.firstCall.args[0]).equal(preset.favorite);
+      });
+
+      it('Sets correct playmode', () => {
+        expect(coordinator.setPlayMode).calledOnce;
+        expect(coordinator.setPlayMode.firstCall.args[0]).eql(preset.playMode);
+      });
+
+      it('Skips to correct track', () => {
+        expect(coordinator.trackSeek).calledOnce;
+        expect(coordinator.trackSeek.firstCall.args[0]).equal(preset.trackNo);
+      });
+
+      it('Skips to correct time', () => {
+        expect(coordinator.timeSeek).calledOnce;
+        expect(coordinator.timeSeek.firstCall.args[0]).equal(preset.elapsedTime);
+      });
+
+      it('Should call sleep', () => {
+        expect(coordinator.sleep).calledOnce;
+        expect(coordinator.sleep.firstCall.args[0]).equal(preset.sleep);
+      });
+
+      it('Should start playback', () => {
+        expect(coordinator.play).calledOnce;
+      });
+
     });
 
-    it('Has invoked getPlayer thrice', () => {
-      expect(system.getPlayer.firstCall.args[0]).equal(preset.test.players[0].roomName);
-      expect(system.getPlayer.secondCall.args[0]).equal(preset.test.players[1].roomName);
-      expect(system.getPlayer.thirdCall.args[0]).equal(preset.test.players[2].roomName);
-    });
+    describe('When it contains an mute=false', () => {
 
-    it('Has set volume correctly', () => {
-      expect(coordinator.setVolume).calledOnce;
-      expect(coordinator.setVolume.firstCall.args[0]).equal(1);
-      expect(member.setVolume).calledTwice;
-      expect(member.setVolume.firstCall.args[0]).equal(2);
-      expect(member.setVolume.secondCall.args[0]).equal(3);
-    });
+      beforeEach(() => {
+        preset.players[2].mute = false;
+      });
 
-    it('Should not break out coordinator since already coordinator', () => {
-      expect(coordinator.becomeCoordinatorOfStandaloneGroup).not.called;
-    });
+      beforeEach(() => {
+        return applyPreset.call(system, preset);
+      });
 
-    it('Groups players with coordinator', () => {
-      expect(member.setAVTransport).calledTwice;
-      expect(member.setAVTransport.firstCall.args[0]).equal('x-rincon:RINCON_0000000001400');
-      expect(member.setAVTransport.secondCall.args[0]).equal('x-rincon:RINCON_0000000001400');
-    });
+      it('Has un-muted player correctly', () => {
+        expect(member.mute).not.called;
+        expect(member.unMute).calledOnce;
+      });
 
-    it('Ungroups players that does\'nt belong to group', () => {
-      expect(superfluousPlayer.becomeCoordinatorOfStandaloneGroup).calledOnce;
-    });
-
-    it('Replaces queue with favorite', () => {
-      expect(coordinator.replaceWithFavorite).calledOnce;
-      expect(coordinator.replaceWithFavorite.firstCall.args[0]).equal(preset.test.favorite);
-    });
-
-    it('Sets correct playmode', () => {
-      expect(coordinator.setPlayMode).calledOnce;
-      expect(coordinator.setPlayMode.firstCall.args[0]).eql(preset.test.playMode);
-    });
-
-    it('Skips to correct track', () => {
-      expect(coordinator.trackSeek).calledOnce;
-      expect(coordinator.trackSeek.firstCall.args[0]).equal(preset.test.trackNo);
-    });
-
-    it('Skips to correct time', () => {
-      expect(coordinator.timeSeek).calledOnce;
-      expect(coordinator.timeSeek.firstCall.args[0]).equal(preset.test.elapsedTime);
-    });
-
-    it('Should call sleep', () => {
-      expect(coordinator.sleep).calledOnce;
-      expect(coordinator.sleep.firstCall.args[0]).equal(preset.test.sleep);
-    });
-
-    it('Should start playback', () => {
-      expect(coordinator.play).calledOnce;
     });
 
   });
@@ -199,15 +230,13 @@ describe('SonosSystem.applyPreset', () => {
       system.getPlayer.onCall(0).returns(coordinator);
 
       preset = {
-        test: {
-          players: [{ roomName: 'Bedroom', volume: 1 }, { roomName: 'Kitchen', volume: 2 }, {
-            roomName: 'Office',
-            volume: 3
-          }]
-        }
+        players: [{ roomName: 'Bedroom', volume: 1 }, { roomName: 'Kitchen', volume: 2 }, {
+          roomName: 'Office',
+          volume: 3
+        }]
       };
 
-      return applyPreset.call(system, preset.test);
+      return applyPreset.call(system, preset);
     });
 
     it('Detaches first player from group', () => {
@@ -243,22 +272,21 @@ describe('SonosSystem.applyPreset', () => {
       };
 
       preset = {
-        test: {
-          players: [{ roomName: 'Bedroom' }],
-          uri: 'x-rincon-stream:UUID_0000000001400',
-          metadata: '<DIDL-Lite></DIDL-Lite>'
-        }
+        players: [{ roomName: 'Bedroom' }],
+        uri: 'x-rincon-stream:UUID_0000000001400',
+        metadata: '<DIDL-Lite></DIDL-Lite>'
+
       };
 
-      return applyPreset.call(system, preset.test);
+      return applyPreset.call(system, preset);
     });
 
     it('Sets uri to preset uri and metadata', () => {
       expect(player.setAVTransport).calledOnce;
-      expect(preset.test.uri).not.undefined;
-      expect(preset.test.metadata).not.undefined;
-      expect(player.setAVTransport.firstCall.args[0]).equal(preset.test.uri);
-      expect(player.setAVTransport.firstCall.args[1]).equal(preset.test.metadata);
+      expect(preset.uri).not.undefined;
+      expect(preset.metadata).not.undefined;
+      expect(player.setAVTransport.firstCall.args[0]).equal(preset.uri);
+      expect(player.setAVTransport.firstCall.args[1]).equal(preset.metadata);
     });
   });
 });
