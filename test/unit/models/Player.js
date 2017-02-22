@@ -328,6 +328,46 @@ describe('Player', () => {
     });
   });
 
+  describe('when sub event occurs', () => {
+
+    it('updates gain', () => {
+      let lastChange = require('../../data/sublastchange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.sub.gain).equals(-3);
+    });
+
+    it('updates crossover', () => {
+      let lastChange = require('../../data/sublastchange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.sub.crossover).equals(90);
+    });
+
+    it('updates polarity', () => {
+      let lastChange = require('../../data/sublastchange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.sub.polarity).equals(0);
+    });
+
+    it('updates enabled', () => {
+      let lastChange = require('../../data/sublastchange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.sub.enabled).equals(true);
+    });
+
+    it('should be part of state data', () => {
+      let lastChange = require('../../data/sublastchange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      player.hasSub = true;
+      expect(player.state.sub).to.eql({
+        gain: -3,
+        crossover: 90,
+        polarity: 0,
+        enabled: true
+      });
+    });
+
+  });
+
   it('Loads prototypes', () => {
     expect(player).respondsTo('replaceWithFavorite');
   });
@@ -460,7 +500,7 @@ describe('Player', () => {
       });
 
       it('Repeat with shuffle on', () => {
-        player.state.playMode.shuffle = true;
+        player._state.playMode.shuffle = true;
         return player.repeat(true)
           .then(() => {
             expect(soap.invoke.firstCall.args).eql([
@@ -484,7 +524,7 @@ describe('Player', () => {
       });
 
       it('Shuffle off', () => {
-        player.state.playMode.repeat = 'all';
+        player._state.playMode.repeat = 'all';
         return player.shuffle(true)
           .then(() => {
             expect(soap.invoke.firstCall.args).eql([

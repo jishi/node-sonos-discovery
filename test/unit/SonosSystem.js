@@ -18,7 +18,6 @@ describe('SonosSystem', () => {
   let Subscriber;
   let subscriber;
   let Player;
-  let Sub;
 
   beforeEach(() => {
     ssdp = {
@@ -55,10 +54,6 @@ describe('SonosSystem', () => {
       '../Subscriber': Subscriber
     }));
 
-    Sub = sinon.spy(proxyquire('../../lib/models/Sub', {
-      '../Subscriber': Subscriber
-    }));
-
     sinon.stub(soap, 'invoke').resolves(fs.createReadStream(`${__dirname}/../data/listavailableservices.xml`));
 
     SonosSystem = proxyquire('../../lib/SonosSystem', {
@@ -66,8 +61,7 @@ describe('SonosSystem', () => {
       './helpers/request': request,
       './NotificationListener': NotificationListener,
       './Subscriber': Subscriber,
-      './models/Player': Player,
-      './models/Sub': Sub
+      './models/Player': Player
     });
   });
 
@@ -175,12 +169,11 @@ describe('SonosSystem', () => {
           });
         });
 
-        it('Attaches SUB to primary player', () => {
+        it('Flags primary player if SUB is connected', () => {
           sonos.zones.forEach((zone) => {
             let tvRoom = zone.members.find((member) => member.roomName === 'TV Room');
             expect(tvRoom).not.undefined;
-            expect(tvRoom.sub).not.undefined;
-            expect(tvRoom.sub.roomName).equal('TV Room (SUB)');
+            expect(tvRoom.hasSub).to.be.true;
           });
         });
 
@@ -188,7 +181,6 @@ describe('SonosSystem', () => {
           let topology = require('../data/topology.json');
           listener.on.withArgs('topology').yield('', topology);
           expect(Player).callCount(5);
-          expect(Sub).calledOnce;
         });
 
         it('Links coordinator property on all players', () => {
