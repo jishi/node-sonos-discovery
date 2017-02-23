@@ -177,10 +177,26 @@ describe('SonosSystem', () => {
           });
         });
 
-        it('Only creates player and sub once', () => {
+        it('should flag stereo pair if SUB is connected', () => {
+          sonos.zones.forEach((zone) => {
+            let livingRoom = zone.members.find((member) => member.roomName === 'Living Room');
+            expect(livingRoom).not.undefined;
+            expect(livingRoom.hasSub).to.be.true;
+          });
+        });
+
+        it('should not flag player if SUB is not connected', () => {
+          sonos.zones.forEach((zone) => {
+            let livingRoom = zone.members.find((member) => member.roomName === 'Kitchen');
+            expect(livingRoom).not.undefined;
+            expect(livingRoom.hasSub).to.be.false;
+          });
+        });
+
+        it('Only creates player once', () => {
           let topology = require('../data/topology.json');
           listener.on.withArgs('topology').yield('', topology);
-          expect(Player).callCount(5);
+          expect(Player).callCount(6);
         });
 
         it('Links coordinator property on all players', () => {
