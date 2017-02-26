@@ -204,5 +204,23 @@
         "channelmapset": "RINCON_30000000000101400:LF,LF;RINCON_30000000000201400:RF,RF;RINCON_30000000000301400:SW,SW"
       }
     ]
+  },
+  {
+    "$name": "zonegroup",
+    "$attrs": {
+      "coordinator": "RINCON_40000000000101400",
+      "id": "RINCON_40000000000101400:49"
+    },
+    "zonegroupmember": {
+      "bootseq": "8",
+      "configuration": "1",
+      "htsatchanmapset": "RINCON_40000000000101400:LF,RF;RINCON_40000000000201400:RR;RINCON_40000000000301400:LR;RINCON_40000000000401400:SW",
+      "icon": "x-rincon-roomicon:living",
+      "location": "http://192.168.1.103:1400/xml/device_description.xml",
+      "mincompatibleversion": "22.0-00000",
+      "softwareversion": "24.0-71060",
+      "uuid": "RINCON_40000000000101400",
+      "zonename": "Home Theatre"
+    }
   }
 ]

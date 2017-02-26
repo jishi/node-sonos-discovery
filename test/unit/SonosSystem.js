@@ -170,33 +170,33 @@ describe('SonosSystem', () => {
         });
 
         it('Flags primary player if SUB is connected', () => {
-          sonos.zones.forEach((zone) => {
-            let tvRoom = zone.members.find((member) => member.roomName === 'TV Room');
-            expect(tvRoom).not.undefined;
-            expect(tvRoom.hasSub).to.be.true;
-          });
+          const tvRoom = sonos.getPlayer('TV Room');
+          expect(tvRoom).not.undefined;
+          expect(tvRoom.hasSub).to.be.true;
         });
 
         it('should flag stereo pair if SUB is connected', () => {
-          sonos.zones.forEach((zone) => {
-            let livingRoom = zone.members.find((member) => member.roomName === 'Living Room');
-            expect(livingRoom).not.undefined;
-            expect(livingRoom.hasSub).to.be.true;
-          });
+          const livingRoom = sonos.getPlayer('Living Room');
+          expect(livingRoom).not.undefined;
+          expect(livingRoom.hasSub).to.be.true;
+        });
+
+        it('should flag PLAYBAR if SUB is connected', () => {
+          const playbar = sonos.getPlayer('Home Theatre');
+          expect(playbar).not.undefined;
+          expect(playbar.hasSub).to.be.true;
         });
 
         it('should not flag player if SUB is not connected', () => {
-          sonos.zones.forEach((zone) => {
-            let livingRoom = zone.members.find((member) => member.roomName === 'Kitchen');
-            expect(livingRoom).not.undefined;
-            expect(livingRoom.hasSub).to.be.false;
-          });
+          const kitchen = sonos.getPlayer('Kitchen');
+          expect(kitchen).not.undefined;
+          expect(kitchen.hasSub).to.be.false;
         });
 
         it('Only creates player once', () => {
           let topology = require('../data/topology.json');
           listener.on.withArgs('topology').yield('', topology);
-          expect(Player).callCount(6);
+          expect(Player).callCount(7);
         });
 
         it('Links coordinator property on all players', () => {
