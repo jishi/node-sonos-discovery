@@ -19,5 +19,21 @@
   ],
   "outputfixed": {
     "val": "0"
+  },
+  "bass": {
+    "val": "3"
+  },
+  "treble":{
+    "val": "-2"
+  },
+  "dialoglevel": {
+    "val": "1"
+  },
+  "nightmode": {
+    "val": "1"
+  },
+  "loudness": {
+    "channel": "Master",
+    "val": "1"
   }
 }

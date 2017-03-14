@@ -299,7 +299,7 @@ describe('Player', () => {
     });
   });
 
-  describe('when volume event occurs', () => {
+  describe('when rendering control event occurs', () => {
     it('Updates volume', () => {
       let lastChange = require('../../data/renderingControlLastChange.json');
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
@@ -319,6 +319,36 @@ describe('Player', () => {
       lastChange.outputfixed.val = '1';
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       expect(player.outputFixed).equals(true);
+    });
+
+    it('loudness is true', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.state.equalizer.loudness).equals(true);
+    });
+
+    it('bass is 3', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.state.equalizer.bass).equals(3);
+    });
+
+    it('treble is -2', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.state.equalizer.treble).equals(-2);
+    });
+
+    it('speech enhancement is true', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.state.equalizer.speechEnhancement).equals(true);
+    });
+
+    it('nightMode is true', () => {
+      let lastChange = require('../../data/renderingControlLastChange.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      expect(player.state.equalizer.nightMode).equals(true);
     });
 
     it('emits event', () => {
