@@ -774,34 +774,78 @@ describe('Player', () => {
       let queue;
       beforeEach(() => {
         let queueStream = fs.createReadStream(path.join(__dirname, '../../data/queue.xml'));
-
         soap.invoke.resolves(queueStream);
-
-        return player.getQueue()
-          .then((q) => {
-            queue = q;
-          });
       });
 
-      it('Should have invoked browse', () => {
-        expect(soap.invoke).calledOnce;
-        expect(soap.invoke.firstCall.args[2]).eql({
-          objectId: 'Q:0',
-          startIndex: 0,
-          limit: 0
+      describe('without arguments', () => {
+
+        beforeEach(() => {
+          return player.getQueue()
+            .then((q) => {
+              queue = q;
+            });
         });
+
+        it('Should have invoked browse', () => {
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args[2]).eql({
+            objectId: 'Q:0',
+            startIndex: 0,
+            limit: 0
+          });
+        });
+
+        it('Parses queue and returns a list of well designed objects', () => {
+          expect(queue).not.empty;
+          expect(queue[0]).eql({
+            uri: 'x-sonos-spotify:spotify%3atrack%3a2uAWmcvujYUNTPCIb2VYKH?sid=9&flags=8224&sn=2',
+            artist: 'Deftones',
+            metadata: undefined,
+            albumTrackNumber: undefined,
+            title: 'Prayers/Triangles',
+            album: 'Prayers/Triangles',
+            albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a2uAWmcvujYUNTPCIb2VYKH%3fsid%3d9%26flags%3d8224%26sn%3d2'
+          });
+        });
+
       });
 
-      it('Parses queue and returns a list of well designed objects', () => {
-        expect(queue).not.empty;
-        expect(queue[0]).eql({
-          uri: 'x-sonos-spotify:spotify%3atrack%3a2uAWmcvujYUNTPCIb2VYKH?sid=9&flags=8224&sn=2',
-          artist: 'Deftones',
-          metadata: undefined,
-          albumTrackNumber: undefined,
-          title: 'Prayers/Triangles',
-          album: 'Prayers/Triangles',
-          albumArtUri: '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a2uAWmcvujYUNTPCIb2VYKH%3fsid%3d9%26flags%3d8224%26sn%3d2'
+      describe('with only limit', () => {
+
+        beforeEach(() => {
+          return player.getQueue(10)
+            .then((q) => {
+              queue = q;
+            });
+        });
+
+        it('Should have invoked browse', () => {
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args[2]).eql({
+            objectId: 'Q:0',
+            startIndex: 0,
+            limit: 10
+          });
+        });
+
+      });
+
+      describe('with limit and offset', () => {
+
+        beforeEach(() => {
+          return player.getQueue(10, 100)
+            .then((q) => {
+              queue = q;
+            });
+        });
+
+        it('Should have invoked browse', () => {
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args[2]).eql({
+            objectId: 'Q:0',
+            startIndex: 100,
+            limit: 10
+          });
         });
       });
     });
@@ -838,5 +882,4 @@ describe('Player', () => {
       });
     });
   });
-})
-;
+});
