@@ -1,0 +1,10 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <s:Body>
+        <u:CreateSavedQueueResponse xmlns:u="urn:schemas-upnp-org:service:AVTransport:1">
+            <NumTracksAdded>0</NumTracksAdded>
+            <NewQueueLength>0</NewQueueLength>
+            <NewUpdateID>0</NewUpdateID>
+            <AssignedObjectID>SQ:1</AssignedObjectID>
+        </u:CreateSavedQueueResponse>
+    </s:Body>
+</s:Envelope>

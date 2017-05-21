@@ -668,6 +668,32 @@ describe('Player', () => {
         });
     });
 
+    it('createSavedQueue', () => {
+      soap.parse.restore();
+      let createSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/createSavedQueue.xml`);
+      createSavedQueueXml.statusCode = 200;
+      soap.invoke.resolves(createSavedQueueXml);
+
+      expect(TYPE.CreateSavedQueue).not.undefined;
+      return player.createSavedQueue('myplaylist')
+        .then((result) => {
+          expect(result).eql({
+            assignedobjectid: 'SQ:1',
+            newqueuelength: '0',
+            newupdateid: '0',
+            numtracksadded: '0'
+          });
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.CreateSavedQueue,
+            {
+              title: 'myplaylist'
+            }
+          ]);
+        });
+    });
+
     it('addURIToQueue', () => {
       soap.parse.restore();
       let addURIToQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToQueue.xml`);
