@@ -668,6 +668,60 @@ describe('Player', () => {
         });
     });
 
+    describe('addURIToSavedQueue browse', () => {
+
+      beforeEach('We need parse functionality here', () => {
+        soap.parse.restore();
+      });
+
+      describe('addURIToSavedQueue2', () => {
+        let playlist;
+        beforeEach(() => {
+          let queueStream = fs.createReadStream(path.join(__dirname, '../../data/playlists.xml'));
+
+          soap.invoke.resolves(queueStream);
+
+          return player.browse()
+            .then((res) => {
+              playlist = res;
+            });
+        });
+
+        it('addURIToSavedQueue should browse first', () => {
+          console.log('yyyyyyyyyyy1', playlist);
+          let addURIToSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToSavedQueue.xml`);
+          addURIToSavedQueueXml.statusCode = 200;
+          soap.invoke.resolves(addURIToSavedQueueXml);
+
+          expect(TYPE.AddURIToSavedQueue).not.undefined;
+          return player.addURIToSavedQueue('1', 'myuri', 'mytitle')
+            .then((result) => {
+              expect(soap.invoke).calledThrice;
+              expect(soap.invoke.secondCall.args).eql([
+                'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
+                TYPE.Browse,
+                {
+                  limit: 100,
+                  objectId: 'SQ:1',
+                  startIndex: 0
+                }
+              ]);
+              expect(soap.invoke.thirdCall.args).eql([
+                'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+                TYPE.AddURIToSavedQueue,
+                {
+                  sqid: '1',
+                  uri: 'myuri',
+                  title: 'mytitle',
+                  updateID: playlist.updateID
+                }
+              ]);
+            });
+        });
+
+      });
+    });
+
     it('createSavedQueue', () => {
       soap.parse.restore();
       let createSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/createSavedQueue.xml`);
@@ -689,6 +743,26 @@ describe('Player', () => {
             TYPE.CreateSavedQueue,
             {
               title: 'myplaylist'
+            }
+          ]);
+        });
+    });
+
+    it('destroyObject', () => {
+      soap.parse.restore();
+      let destroyObjectXml = fs.createReadStream(`${__dirname}/../../data/destroyObject.xml`);
+      destroyObjectXml.statusCode = 200;
+      soap.invoke.resolves(destroyObjectXml);
+
+      expect(TYPE.DestroyObject).not.undefined;
+      return player.destroyObject('1')
+        .then(() => {
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
+            TYPE.DestroyObject,
+            {
+              id: '1'
             }
           ]);
         });
