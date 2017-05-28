@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 const fs = require('fs');
 const path = require('path');
+const util = require('util');
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
 
@@ -668,14 +669,19 @@ describe('Player', () => {
         });
     });
 
-    describe('addURIToSavedQueue browse', () => {
+    describe('addURIToSavedQueue', () => {
 
       beforeEach('We need parse functionality here', () => {
         soap.parse.restore();
       });
 
-      describe('addURIToSavedQueue2', () => {
-        let playlist;
+      describe('Setup playlist', () => {
+        let playlist = {};
+
+        // numtracksadded
+        playlist.updateID = 1;
+
+        /*
         beforeEach(() => {
           let queueStream = fs.createReadStream(path.join(__dirname, '../../data/playlists.xml'));
 
@@ -686,18 +692,20 @@ describe('Player', () => {
               playlist = res;
             });
         });
+        */
 
-        it('addURIToSavedQueue should browse first', () => {
-          console.log('yyyyyyyyyyy1', playlist);
+        it('Should have invoked browse to find the playlist to add URI to', () => {
           let addURIToSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToSavedQueue.xml`);
           addURIToSavedQueueXml.statusCode = 200;
           soap.invoke.resolves(addURIToSavedQueueXml);
 
           expect(TYPE.AddURIToSavedQueue).not.undefined;
+
           return player.addURIToSavedQueue('1', 'myuri', 'mytitle')
             .then((result) => {
-              expect(soap.invoke).calledThrice;
-              expect(soap.invoke.secondCall.args).eql([
+              // updatedID in res
+              expect(soap.invoke).calledTwice;
+              expect(soap.invoke.firstCall.args).eql([
                 'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
                 TYPE.Browse,
                 {
@@ -706,14 +714,17 @@ describe('Player', () => {
                   startIndex: 0
                 }
               ]);
-              expect(soap.invoke.thirdCall.args).eql([
+
+              // todo hostname/uri no cifs multitrackadd
+              expect(soap.invoke.secondCall.args).eql([
                 'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
                 TYPE.AddURIToSavedQueue,
                 {
                   sqid: '1',
                   uri: 'myuri',
                   title: 'mytitle',
-                  updateID: playlist.updateID
+                  updateID: playlist.updateID,
+                  upnpClass: 'object.item.audioItem.musicTrack'
                 }
               ]);
             });
