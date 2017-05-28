@@ -701,7 +701,7 @@ describe('Player', () => {
 
           expect(TYPE.AddURIToSavedQueue).not.undefined;
 
-          return player.addURIToSavedQueue('1', 'myuri', 'mytitle')
+          return player.addURIToSavedQueue('1', 'x-file-cifs://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3', 'track title')
             .then((result) => {
               // updatedID in res
               expect(soap.invoke).calledTwice;
@@ -714,15 +714,14 @@ describe('Player', () => {
                   startIndex: 0
                 }
               ]);
-
-              // todo hostname/uri no cifs multitrackadd
               expect(soap.invoke.secondCall.args).eql([
                 'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
                 TYPE.AddURIToSavedQueue,
                 {
                   sqid: '1',
-                  uri: 'myuri',
-                  title: 'mytitle',
+                  uri: 'x-file-cifs://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3',
+                  itemId: 'S://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3',
+                  title: 'track title',
                   updateID: playlist.updateID,
                   upnpClass: 'object.item.audioItem.musicTrack'
                 }
