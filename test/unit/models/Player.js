@@ -668,6 +668,86 @@ describe('Player', () => {
         });
     });
 
+    it('createSavedQueue', () => {
+      soap.parse.restore();
+      let createSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/createSavedQueue.xml`);
+      createSavedQueueXml.statusCode = 200;
+      soap.invoke.resolves(createSavedQueueXml);
+
+      expect(TYPE.CreateSavedQueue).not.undefined;
+      return player.createSavedQueue('myplaylist')
+        .then((result) => {
+          expect(result).eql({
+            assignedobjectid: 'SQ:1',
+            newqueuelength: '0',
+            newupdateid: '0',
+            numtracksadded: '0'
+          });
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.CreateSavedQueue,
+            {
+              title: 'myplaylist'
+            }
+          ]);
+        });
+    });
+
+    it('destroyObject', () => {
+      soap.parse.restore();
+      let destroyObjectXml = fs.createReadStream(`${__dirname}/../../data/destroyObject.xml`);
+      destroyObjectXml.statusCode = 200;
+      soap.invoke.resolves(destroyObjectXml);
+
+      expect(TYPE.DestroyObject).not.undefined;
+      return player.destroyObject('1')
+        .then(() => {
+          expect(soap.invoke).calledOnce;
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
+            TYPE.DestroyObject,
+            {
+              id: '1'
+            }
+          ]);
+        });
+    });
+
+    it('Should have invoked browse to find the playlist to add URI to', () => {
+      let addURIToSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToSavedQueue.xml`);
+      addURIToSavedQueueXml.statusCode = 200;
+      soap.invoke.resolves(addURIToSavedQueueXml);
+
+      expect(TYPE.AddURIToSavedQueue).not.undefined;
+
+      return player.addURIToSavedQueue('1', 'x-file-cifs://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3', 'track title')
+        .then((result) => {
+          expect(soap.invoke).calledThrice;
+          expect(soap.invoke.secondCall.args).eql([
+            'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
+            TYPE.Browse,
+            {
+              limit: 100,
+              objectId: 'SQ:1',
+              startIndex: 0
+            }
+          ]);
+          expect(soap.invoke.thirdCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.AddURIToSavedQueue,
+            {
+              sqid: '1',
+              uri: 'x-file-cifs://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3',
+              itemId: 'S://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3',
+              title: 'track title',
+              updateID: NaN, /* I did not find a way to stub the updateID from browser */
+              upnpClass: 'object.item.audioItem.musicTrack'
+            }
+          ]);
+        });
+    });
+
     it('addURIToQueue', () => {
       soap.parse.restore();
       let addURIToQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToQueue.xml`);
@@ -828,6 +908,7 @@ describe('Player', () => {
           uri: 'file:///jffs/settings/savedqueues.rsq#2',
           title: 'Morgon',
           artist: undefined,
+          sqid: '2',
           albumArtUri: [
             '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a35N1AduT1LDo3deLfYniTY%3fsid%3d9%26flags%3d0',
             '/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a1MQYow43CGLYMECVSjTpCM%3fsid%3d9%26flags%3d0',

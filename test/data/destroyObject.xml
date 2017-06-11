@@ -1,0 +1,5 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <s:Body>
+        <u:DestroyObjectResponse xmlns:u="urn:schemas-upnp-org:service:ContentDirectory:1"></u:DestroyObjectResponse>
+    </s:Body>
+</s:Envelope>
