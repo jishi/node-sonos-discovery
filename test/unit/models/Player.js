@@ -4,7 +4,6 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 const fs = require('fs');
 const path = require('path');
-const util = require('util');
 require('chai').use(require('sinon-chai'));
 require('sinon-as-promised');
 
