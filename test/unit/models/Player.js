@@ -669,69 +669,6 @@ describe('Player', () => {
         });
     });
 
-    describe('addURIToSavedQueue', () => {
-
-      beforeEach('We need parse functionality here', () => {
-        soap.parse.restore();
-      });
-
-      describe('Setup playlist', () => {
-        let playlist = {};
-
-        // numtracksadded
-        playlist.updateID = 1;
-
-        /*
-        beforeEach(() => {
-          let queueStream = fs.createReadStream(path.join(__dirname, '../../data/playlists.xml'));
-
-          soap.invoke.resolves(queueStream);
-
-          return player.browse()
-            .then((res) => {
-              playlist = res;
-            });
-        });
-        */
-
-        it('Should have invoked browse to find the playlist to add URI to', () => {
-          let addURIToSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToSavedQueue.xml`);
-          addURIToSavedQueueXml.statusCode = 200;
-          soap.invoke.resolves(addURIToSavedQueueXml);
-
-          expect(TYPE.AddURIToSavedQueue).not.undefined;
-
-          return player.addURIToSavedQueue('1', 'x-file-cifs://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3', 'track title')
-            .then((result) => {
-              // updatedID in res
-              expect(soap.invoke).calledTwice;
-              expect(soap.invoke.firstCall.args).eql([
-                'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
-                TYPE.Browse,
-                {
-                  limit: 100,
-                  objectId: 'SQ:1',
-                  startIndex: 0
-                }
-              ]);
-              expect(soap.invoke.secondCall.args).eql([
-                'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
-                TYPE.AddURIToSavedQueue,
-                {
-                  sqid: '1',
-                  uri: 'x-file-cifs://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3',
-                  itemId: 'S://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3',
-                  title: 'track title',
-                  updateID: playlist.updateID,
-                  upnpClass: 'object.item.audioItem.musicTrack'
-                }
-              ]);
-            });
-        });
-
-      });
-    });
-
     it('createSavedQueue', () => {
       soap.parse.restore();
       let createSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/createSavedQueue.xml`);
@@ -773,6 +710,40 @@ describe('Player', () => {
             TYPE.DestroyObject,
             {
               id: '1'
+            }
+          ]);
+        });
+    });
+
+    it('Should have invoked browse to find the playlist to add URI to', () => {
+      let addURIToSavedQueueXml = fs.createReadStream(`${__dirname}/../../data/addURIToSavedQueue.xml`);
+      addURIToSavedQueueXml.statusCode = 200;
+      soap.invoke.resolves(addURIToSavedQueueXml);
+
+      expect(TYPE.AddURIToSavedQueue).not.undefined;
+
+      return player.addURIToSavedQueue('1', 'x-file-cifs://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3', 'track title')
+        .then((result) => {
+          expect(soap.invoke).calledThrice;
+          expect(soap.invoke.secondCall.args).eql([
+            'http://192.168.1.151:1400/MediaServer/ContentDirectory/Control',
+            TYPE.Browse,
+            {
+              limit: 100,
+              objectId: 'SQ:1',
+              startIndex: 0
+            }
+          ]);
+          expect(soap.invoke.thirdCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/AVTransport/Control',
+            TYPE.AddURIToSavedQueue,
+            {
+              sqid: '1',
+              uri: 'x-file-cifs://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3',
+              itemId: 'S://MacBook-Air-de-laurent-2/Musique/iTunes/iTunes%20Media/Music/The%20xx/I%20See%20You/06%20Replica.mp3',
+              title: 'track title',
+              updateID: NaN, /* I did not find a way to stub the updateID from browser */
+              upnpClass: 'object.item.audioItem.musicTrack'
             }
           ]);
         });
