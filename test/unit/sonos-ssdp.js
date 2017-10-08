@@ -38,6 +38,10 @@ describe('Sonos-SSDP', function () {
     });
   });
 
+  afterEach(() => {
+    ssdp.stop();
+  });
+
   it('Creates listening UDP socket', () => {
     ssdp.start();
 

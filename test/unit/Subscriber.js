@@ -14,27 +14,38 @@ describe('Subscriber', () => {
     successfulRequest = { headers: { sid: 1234567 } };
     request = sinon.stub();
     Subscriber = proxyquire('../../lib/Subscriber', {
-      './helpers/request': request
+      './helpers/request': request,
     });
   });
 
-  it('Sends a subscription with the correct parameters', () => {
-    request.resolves(successfulRequest);
-    new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
-    expect(request).calledOnce;
-    expect(request.firstCall.args[0]).eql({
-      uri: 'http://192.168.1.151:1400/test/path',
-      method: 'SUBSCRIBE',
-      headers: {
-        CALLBACK: '<http://127.0.0.2/>',
-        NT: 'upnp:event',
-        TIMEOUT: 'Second-600'
-      },
-      type: 'stream'
+  describe('Sucessful subscription', () => {
+    let subscriber;
+
+    beforeEach(() => {
+      request.resolves(successfulRequest);
+      subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
+    });
+
+    afterEach(() => {
+      subscriber.dispose();
+    });
+
+    it('Sends a subscription with the correct parameters', () => {
+      expect(request).calledOnce;
+      expect(request.firstCall.args[0]).eql({
+        uri: 'http://192.168.1.151:1400/test/path',
+        method: 'SUBSCRIBE',
+        headers: {
+          CALLBACK: '<http://127.0.0.2/>',
+          NT: 'upnp:event',
+          TIMEOUT: 'Second-600',
+        },
+        type: 'stream',
+      });
     });
   });
 
-  it('Resubscribes if failure', function (done) {
+  it('Resubscribes if failure', function(done) {
     request.rejects('Rejecting subscribe attempt. This is a mocked error');
     request.onCall(2).resolves(successfulRequest);
     let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600, 100);
@@ -49,19 +60,19 @@ describe('Subscriber', () => {
         headers: {
           CALLBACK: '<http://127.0.0.2/>',
           NT: 'upnp:event',
-          TIMEOUT: 'Second-600'
-        }
+          TIMEOUT: 'Second-600',
+        },
       });
       subscriber.dispose();
       done();
     }, 150);
   });
 
-  it('Resubscribes without sid if resubscribe fails', function (done) {
+  it('Resubscribes without sid if resubscribe fails', function(done) {
     request.onCall(0).resolves({
       headers: {
-        sid: '12345678'
-      }
+        sid: '12345678',
+      },
     });
     request.rejects('Rejecting subscribe attempt. This is a mocked error');
     let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1, 100);
@@ -75,8 +86,8 @@ describe('Subscriber', () => {
         type: 'stream',
         headers: {
           TIMEOUT: 'Second-0.1',
-          SID: '12345678'
-        }
+          SID: '12345678',
+        },
       });
 
       expect(request.thirdCall.args[0]).eql({
@@ -86,8 +97,8 @@ describe('Subscriber', () => {
         headers: {
           CALLBACK: '<http://127.0.0.2/>',
           NT: 'upnp:event',
-          TIMEOUT: 'Second-0.1'
-        }
+          TIMEOUT: 'Second-0.1',
+        },
       });
       subscriber.dispose();
       done();
@@ -97,8 +108,8 @@ describe('Subscriber', () => {
   it('Resubscribes right before timeout', (done) => {
     request.resolves({
       headers: {
-        sid: '1234567890'
-      }
+        sid: '1234567890',
+      },
     });
     let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
 
@@ -110,8 +121,8 @@ describe('Subscriber', () => {
         type: 'stream',
         headers: {
           TIMEOUT: 'Second-0.1',
-          SID: '1234567890'
-        }
+          SID: '1234567890',
+        },
       });
       subscriber.dispose();
       done();
@@ -121,8 +132,8 @@ describe('Subscriber', () => {
   it('Sends unsubscribe if dispose is called', (done) => {
     request.resolves({
       headers: {
-        sid: '1234567890'
-      }
+        sid: '1234567890',
+      },
     });
     let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
 
@@ -134,8 +145,8 @@ describe('Subscriber', () => {
         type: 'stream',
         uri: 'http://192.168.1.151:1400/test/path',
         headers: {
-          SID: '1234567890'
-        }
+          SID: '1234567890',
+        },
       });
       done();
     });
@@ -144,8 +155,8 @@ describe('Subscriber', () => {
   it('Stops renewing if dispose is called', (done) => {
     request.resolves({
       headers: {
-        sid: '1234567890'
-      }
+        sid: '1234567890',
+      },
     });
     let subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1);
 
@@ -161,15 +172,20 @@ describe('Subscriber', () => {
 
   describe('When request fails 5 consecutive times', () => {
     let errorCallback = sinon.spy();
+    let subscriber;
 
     beforeEach(() => {
       request.rejects();
     });
 
     beforeEach((done) => {
-      const subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1, 100);
+      subscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 0.1, 100);
       subscriber.once('dead', errorCallback);
       setTimeout(done, 500);
+    });
+
+    afterEach(() => {
+      subscriber.dispose();
     });
 
     it('Emits error if rejected too many times', () => {
