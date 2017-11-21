@@ -513,6 +513,30 @@ describe('Player', () => {
         });
     });
 
+    it('setBass', () => {
+      expect(TYPE.SetBass).not.undefined;
+      return player.setBass(2)
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
+            TYPE.SetBass,
+            { level: 2 }
+          ]);
+        });
+    });
+
+    it('setTreble', () => {
+      expect(TYPE.SetTreble).not.undefined;
+      return player.setTreble(-2)
+        .then(() => {
+          expect(soap.invoke.firstCall.args).eql([
+            'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
+            TYPE.SetTreble,
+            { level: -2 }
+          ]);
+        });
+    });
+
     describe('Playmode dependant tests', () => {
 
       it('Repeat with no state', () => {
