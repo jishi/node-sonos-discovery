@@ -15,7 +15,7 @@
     "chai": "*",
     "jscs": "^3.0.7",
     "jshint": "~2.8.0",
-    "mocha": "*",
+    "mocha": "^4.0.1",
     "proxyquire": "^1.7.3",
     "rewire": "^2.5.1",
     "sinon": "^1.17.2",
