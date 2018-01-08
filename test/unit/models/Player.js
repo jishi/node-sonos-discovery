@@ -9,7 +9,7 @@ require('sinon-as-promised');
 
 const soap = require('../../../lib/helpers/soap');
 
-describe('Player', () => {
+describe.only('Player', () => {
   let zoneMemberData;
   let request;
   let Player;
@@ -429,6 +429,7 @@ describe('Player', () => {
 
     const volumeCases = [
       { type: TYPE.Volume, action: 'setVolume', value: 10, expectation: 10 },
+      { type: TYPE.Volume, action: 'setVolume', value: '10', expectation: 10 },
       { type: TYPE.Volume, action: 'setVolume', value: '+1', expectation: 6 },
       { type: TYPE.Volume, action: 'setVolume', value: '-1', expectation: 4 }
     ];
@@ -437,6 +438,7 @@ describe('Player', () => {
         expect(test.type, test.action).not.undefined;
         return player[test.action](test.value)
           .then(() => {
+            expect(player.state.volume).equal(test.expectation);
             expect(soap.invoke.firstCall.args, test.action).eql([
               'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
               test.type,
