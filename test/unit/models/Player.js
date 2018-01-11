@@ -428,10 +428,10 @@ describe.only('Player', () => {
     });
 
     const volumeCases = [
-      { type: TYPE.Volume, action: 'setVolume', value: 10, expectation: 10 },
-      { type: TYPE.Volume, action: 'setVolume', value: '10', expectation: 10 },
-      { type: TYPE.Volume, action: 'setVolume', value: '+1', expectation: 6 },
-      { type: TYPE.Volume, action: 'setVolume', value: '-1', expectation: 4 }
+      { type: TYPE.Volume, action: 'setVolume', value: 10, expectation: 10, channel: 'Master' },
+      { type: TYPE.Volume, action: 'setVolume', value: '10', expectation: 10, channel: 'Master' },
+      { type: TYPE.Volume, action: 'setVolume', value: '+1', expectation: 6, channel: 'Master' },
+      { type: TYPE.Volume, action: 'setVolume', value: '-1', expectation: 4, channel: 'Master' }
     ];
     volumeCases.forEach((test) => {
       it(`Volume ${test.value} should be ${test.expectation}`, () => {
@@ -442,7 +442,7 @@ describe.only('Player', () => {
             expect(soap.invoke.firstCall.args, test.action).eql([
               'http://192.168.1.151:1400/MediaRenderer/RenderingControl/Control',
               test.type,
-              { volume: test.expectation }
+              { channel: test.channel, volume: test.expectation }
             ]);
           });
       });
