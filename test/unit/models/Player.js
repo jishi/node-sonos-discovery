@@ -147,6 +147,7 @@ describe.only('Player', () => {
         absoluteAlbumArtUri: 'http://example.org/image1',
         duration: 318,
         uri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
+        trackUri: 'x-sonos-spotify:spotify%3atrack%3a5qAFqkXoQd2RfjZ2j1ay0w?sid=9&flags=8224&sn=9',
         type: 'track',
         stationName: '',
       });
@@ -201,6 +202,7 @@ describe.only('Player', () => {
         absoluteAlbumArtUri: 'http://192.168.1.151:1400/getaa?s=1&u=x-sonosapi-stream%3as17553%3fsid%3d254%26flags%3d8224%26sn%3d0',
         duration: 0,
         uri: 'x-sonosapi-stream:s17553?sid=254&flags=8224&sn=0',
+        trackUri: 'x-sonosapi-stream:s17553?sid=254&flags=8224&sn=0',
         type: 'radio'
       });
 
@@ -245,6 +247,7 @@ describe.only('Player', () => {
         albumArtUri: undefined,
         duration: 0,
         uri: 'x-rincon-mp3radio://sc01.scahw.com.au:80/buddha_32',
+        trackUri: 'x-rincon-mp3radio://sc01.scahw.com.au:80/buddha_32',
         type: 'radio'
       });
 
