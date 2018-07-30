@@ -1,0 +1,45 @@
+{
+  "$name": "instanceid",
+  "$attrs": {
+    "val": "0"
+  },
+  "transportstate": {
+    "val": "PLAYING"
+  },
+  "currentplaymode": {
+    "val": "NORMAL"
+  },
+  "currentcrossfademode": {
+    "val": "0"
+  },
+  "numberoftracks": {
+    "val": "1"
+  },
+  "currenttrack": {
+    "val": "1"
+  },
+  "currentsection": {
+    "val": "0"
+  },
+  "currenttrackuri": {
+    "val": "x-sonos-vli:RINCON_5CAAFD332AA201400:1,airplay:b028aaff52596e808002b59c5e77ee6a"
+  },
+  "currenttrackduration": {
+    "val": "0:03:00"
+  },
+  "currenttrackmetadata": {
+    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\"><res></res><upnp:albumArtURI>http://10.0.1.12:1400/getaa?v=0&amp;vli=1&amp;u=1214993705</upnp:albumArtURI><upnp:class>object.item.audioItem.audioBroadcast.live</upnp:class></item></DIDL-Lite>"
+  },
+  "r:nexttrackuri": {
+    "val": ""
+  },
+  "r:nexttrackmetadata": {
+    "val": ""
+  },
+  "r:enqueuedtransporturi": {
+    "val": ""
+  },
+  "r:enqueuedtransporturimetadata": {
+    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\"><res></res><upnp:albumArtURI>http://10.0.1.12:1400/getaa?v=0&amp;vli=1&amp;u=1214993705</upnp:albumArtURI><upnp:class>object.item.audioItem.audioBroadcast.live</upnp:class></item></DIDL-Lite>"
+  }
+}

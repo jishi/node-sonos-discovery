@@ -282,6 +282,17 @@ describe.only('Player', () => {
     });
   });
 
+  describe('When it receives a transport-state update for airplay 2 streaming', () => {
+
+    it('Doesn\'t crash while streaming airplay 2', (done) => {
+      let lastChange = require('../../data/avtransportlastchange_airplay.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      player.on('transport-state', () => {
+        done();
+      });
+    });
+  });
+
   describe('When radio already has an absolute url', () => {
 
     beforeEach(() => {
