@@ -1,0 +1,48 @@
+{
+  "$name": "instanceid",
+  "$attrs": {
+    "val": "0"
+  },
+  "transportstate": {
+    "val": "PLAYING"
+  },
+  "currentplaymode": {
+    "val": "NORMAL"
+  },
+  "currentcrossfademode": {
+    "val": "0"
+  },
+  "numberoftracks": {
+    "val": "11"
+  },
+  "currenttrack": {
+    "val": "1"
+  },
+  "currentsection": {
+    "val": "0"
+  },
+  "currenttrackuri": {
+    "val": "x-sonos-http:9382.mp4?sid=240&flags=32&sn=23"
+  },
+  "currenttrackduration": {
+    "val": "0:04:02"
+  },
+  "currenttrackmetadata": {
+    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\" restricted=\"true\"><res protocolInfo=\"sonos.com-http:*:audio/mp4:*\" duration=\"0:04:02\">x-sonos-http:9382.mp4?sid=240&amp;flags=32&amp;sn=23</res><r:streamContent></r:streamContent><r:radioShowMd></r:radioShowMd><upnp:albumArtURI>/getaa?s=1&amp;u=x-sonos-http%3a9382.mp4%3fsid%3d240%26flags%3d32%26sn%3d23</upnp:albumArtURI><dc:title>One Fine Day</dc:title><upnp:class>object.item.audioItem.musicTrack</upnp:class><dc:creator>Astralasia</dc:creator><upnp:album>Shamanic Trance - Space Funk Mix By Cosmix</upnp:album></item></DIDL-Lite>"
+  },
+  "r:nexttrackuri": {
+    "val": "x-sonos-http:9390.mp4?sid=240&flags=32&sn=23"
+  },
+  "r:nexttrackmetadata": {
+    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"-1\" parentID=\"-1\" restricted=\"true\"><res protocolInfo=\"sonos.com-http:*:audio/mp4:*\" duration=\"0:07:26\">x-sonos-http:9390.mp4?sid=240&amp;flags=32&amp;sn=23</res><upnp:albumArtURI>/getaa?s=1&amp;u=x-sonos-http%3a9390.mp4%3fsid%3d240%26flags%3d32%26sn%3d23</upnp:albumArtURI><dc:title>Earth Ascending</dc:title><upnp:class>object.item.audioItem.musicTrack</upnp:class><dc:creator>Moksha</dc:creator><upnp:album>Shamanic Trance - Space Funk Mix By Cosmix</upnp:album></item></DIDL-Lite>"
+  },
+  "r:enqueuedtransporturi": {
+    "val": "x-rincon-cpcontainer:1004006c9381?sid=240&flags=108&sn=23"
+  },
+  "r:enqueuedtransporturimetadata": {
+    "val": "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"1004006c9381\" parentID=\"10050064321\" restricted=\"true\"><dc:title>Shamanic Trance - Space Funk Mix By Cosmix</dc:title><upnp:class>object.container.album.musicAlbum</upnp:class><upnp:albumArtURI>http://192.168.200.20:4040/coverArt.view?id=9381&amp;auth=1583337699&amp;size=300</upnp:albumArtURI><desc id=\"cdudn\" nameSpace=\"urn:schemas-rinconnetworks-com:metadata-1-0/\">SA_RINCON61447_andy</desc></item></DIDL-Lite>"
+  },
+  "currenttransportactions": {
+    "val": "Set, Stop, Pause, Play, X_DLNA_SeekTime, Next, X_DLNA_SeekTrackNr"
+  }
+}

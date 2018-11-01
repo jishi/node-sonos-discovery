@@ -9,7 +9,7 @@ require('sinon-as-promised');
 
 const soap = require('../../../lib/helpers/soap');
 
-describe.only('Player', () => {
+describe('Player', () => {
   let zoneMemberData;
   let request;
   let Player;
@@ -288,6 +288,18 @@ describe.only('Player', () => {
       let lastChange = require('../../data/avtransportlastchange_airplay.json');
       listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
       player.on('transport-state', () => {
+        done();
+      });
+    });
+  });
+
+  describe('When it receives a transport-state update for a DLNA server', () => {
+
+    it('Should have album art from EnqueuedURIMetadata', (done) => {
+      let lastChange = require('../../data/avtransportlastchange_subsonic.json');
+      listener.on.withArgs('last-change').yield('RINCON_00000000000001400', lastChange);
+      player.on('transport-state', (state) => {
+        expect(state.currentTrack.absoluteAlbumArtUri).to.equal('http://192.168.200.20:4040/coverArt.view?id=9381&auth=1583337699&size=300');
         done();
       });
     });
