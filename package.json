@@ -14,7 +14,7 @@
   "devDependencies": {
     "chai": "*",
     "jscs": "^3.0.7",
-    "jshint": "~2.8.0",
+    "jshint": "~2.13.5",
     "mocha": "^4.0.1",
     "proxyquire": "^1.7.3",
     "rewire": "^2.5.1",
