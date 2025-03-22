@@ -17,7 +17,7 @@ describe('deezer', function () {
   it('should load highres art', () => {
     return deezer.tryGetHighResArt('x-sonosprog-http:tr-flac%3a3134041.flac?sid=2&flags=8224&sn=7')
       .then((url) => {
-        expect(url).to.contain('deezer.com/images/cover/5646492f1aec0168e52814d27d2d9a67/500x500-000000-80-0-0.jpg');
+        expect(url).to.contain('cdn-images.dzcdn.net/images/cover/5646492f1aec0168e52814d27d2d9a67/500x500-000000-80-0-0.jpg');
       });
   });
 

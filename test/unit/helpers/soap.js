@@ -31,7 +31,7 @@ describe('soap', () => {
         SOAPACTION: '"urn:schemas-upnp-org:service:RenderingControl:1#SetEQ"',
         'CONTENT-LENGTH': 312
       },
-      body: new Buffer('<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:SetEQ xmlns:u="urn:schemas-upnp-org:service:RenderingControl:1"><InstanceID>0</InstanceID><EQType>SubGain</EQType><DesiredValue>-2</DesiredValue></u:SetEQ></s:Body></s:Envelope>'),
+      body: Buffer.from('<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:SetEQ xmlns:u="urn:schemas-upnp-org:service:RenderingControl:1"><InstanceID>0</InstanceID><EQType>SubGain</EQType><DesiredValue>-2</DesiredValue></u:SetEQ></s:Body></s:Envelope>'),
       type: 'stream'
     });
     expect(result).instanceOf(Promise);
@@ -52,7 +52,7 @@ describe('soap', () => {
         SOAPACTION: '"urn:schemas-upnp-org:service:AVTransport:1#Play"',
         'CONTENT-LENGTH': 266
       },
-      body: new Buffer('<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:Play xmlns:u="urn:schemas-upnp-org:service:AVTransport:1"><InstanceID>0</InstanceID><Speed>1</Speed></u:Play></s:Body></s:Envelope>'),
+      body: Buffer.from('<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:Play xmlns:u="urn:schemas-upnp-org:service:AVTransport:1"><InstanceID>0</InstanceID><Speed>1</Speed></u:Play></s:Body></s:Envelope>'),
       type: 'stream'
     });
   });

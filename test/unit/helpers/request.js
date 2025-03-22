@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 const Readable = require('stream').Readable;
 require('chai').use(require('sinon-chai'));
+const _ = require('lodash');
 
 describe('request', () => {
   let http;
@@ -50,7 +51,7 @@ describe('request', () => {
     });
 
     expect(http.request).calledOnce;
-    expect(http.request.firstCall.args[0]).eql({
+    expect(_.omit(http.request.firstCall.args[0], 'agent')).eql({
       method: 'SUBSCRIBE',
       path: '/path',
       host: '127.0.0.1',
@@ -71,7 +72,7 @@ describe('request', () => {
     });
 
     expect(https.request).calledOnce;
-    expect(https.request.firstCall.args[0]).eql({
+    expect(_.omit(https.request.firstCall.args[0], 'agent')).eql({
       method: 'SUBSCRIBE',
       path: '/path',
       host: '127.0.0.1',
@@ -108,7 +109,7 @@ describe('request', () => {
     });
 
     expect(http.request).calledOnce;
-    expect(http.request.firstCall.args[0]).eql({
+    expect(_.omit(http.request.firstCall.args[0], 'agent')).eql({
       method: 'GET',
       path: '/path',
       host: '127.0.0.1',
