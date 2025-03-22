@@ -98,7 +98,7 @@ describe('Sonos-SSDP', function () {
 
     ssdp.on('found', cb);
 
-    dgram.createSocket.yield(new Buffer(buffer), {
+    dgram.createSocket.yield(Buffer.from(buffer), {
       address: '127.0.0.1'
     });
 
