@@ -11,6 +11,7 @@ describe('SonosSystem.applyPreset', () => {
     let coordinator;
     let member;
     let preset;
+    let badRoomPreset;
     let superfluousPlayer;
     let otherPlayer;
 
@@ -84,7 +85,7 @@ describe('SonosSystem.applyPreset', () => {
       system.getPlayer.withArgs('Office').returns(member);
 
       preset = {
-        players: [{ roomName: 'Kitchen', volume: 1 }, { roomName: 'Other room', volume: 2 }, {
+        players: [{ roomName: 'Kitchen', volume: 1 }, { roomName: 'Other room', volume: 2 }, { roomName: 'Bad room', volume: 2 }, {
           roomName: 'Office',
           volume: 3,
           mute: true
@@ -102,11 +103,17 @@ describe('SonosSystem.applyPreset', () => {
         sleep: 600
       };
     });
+    badRoomPreset = preset;
 
     describe('When applying preset', () => {
 
       beforeEach(() => {
-        return applyPreset.call(system, preset);
+        let result = applyPreset.call(system, preset);
+        if (preset === badRoomPreset) {
+          expect(result.stderr).to.contain('ERROR preset My favorite: bad room name Bad room');
+        }
+
+        return result;
       });
 
       it('Pauses all zones', () => {
@@ -181,7 +188,7 @@ describe('SonosSystem.applyPreset', () => {
     describe('When it contains an mute=false', () => {
 
       beforeEach(() => {
-        preset.players[2].mute = false;
+        preset.players[3].mute = false;
       });
 
       beforeEach(() => {
@@ -289,4 +296,5 @@ describe('SonosSystem.applyPreset', () => {
       expect(player.setAVTransport.firstCall.args[1]).equal(preset.metadata);
     });
   });
+
 });
