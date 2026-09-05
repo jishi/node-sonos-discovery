@@ -85,6 +85,32 @@ describe('SonosSystem', () => {
       expect(ssdp.start).calledOnce;
     });
 
+    describe('If the initial device description fetch fails', () => {
+
+      beforeEach(() => {
+        request.onCall(0).rejects(new Error('ECONNREFUSED'));
+        ssdp.once.yield({
+          ip: '127.0.0.1',
+          location: 'http://127.0.0.1:1400/xml',
+          household: 'Sonos_1234567890abcdef'
+        });
+      });
+
+      it('Restarts discovery so the api can recover', function (done) {
+        this.timeout(5000);
+
+        setTimeout(() => {
+          try {
+            expect(request).calledOnce;
+            expect(ssdp.start).calledTwice;
+            done();
+          } catch (e) {
+            done(e);
+          }
+        }, 1200);
+      });
+    });
+
     describe('when topology is done', () => {
 
       beforeEach((done) => {
