@@ -8,7 +8,6 @@ describe('Sonos-SSDP', function () {
   let ssdp;
   let dgram;
   let socket;
-  let os;
 
   beforeEach(() => {
     socket = {
@@ -22,19 +21,9 @@ describe('Sonos-SSDP', function () {
     dgram = {
       createSocket: sinon.stub().returns(socket)
     };
-    os = {
-      networkInterfaces: sinon.stub().returns({
-        eth0: [{
-          internal: false,
-          family: 'IPv4',
-          address: '10.0.0.1'
-        }]
-      })
-    };
 
     ssdp = proxyquire('../../lib/sonos-ssdp', {
-      dgram,
-      os
+      dgram
     });
   });
 
@@ -74,13 +63,13 @@ describe('Sonos-SSDP', function () {
     }, 1500);
   });
 
-  it('Switches interface if more than 5 seconds elapse', function (done) {
+  it('Stays bound to the wildcard address after 5 seconds', function (done) {
     this.timeout(10000);
     ssdp.start();
     socket.bind.yield();
     setTimeout(() => {
       expect(socket.bind).calledTwice;
-      expect(socket.bind.secondCall.args[1]).equals('10.0.0.1');
+      expect(socket.bind.secondCall.args[1]).equals('0.0.0.0');
       done();
     }, 5500);
   });
