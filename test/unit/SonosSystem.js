@@ -227,6 +227,18 @@ describe('SonosSystem', () => {
           expect(player.roomName).equals('TV Room');
         });
 
+        it('Does not query MusicServices when topology has no visible players', () => {
+          const emptyTopology = [{
+            $attrs: { coordinator: 'RINCON_VANISHED', id: 'RINCON_VANISHED:0' },
+            zonegroupmember: { uuid: 'RINCON_VANISHED', invisible: '1', zonename: 'Offline' }
+          }];
+
+          listener.on.withArgs('topology').yield('', emptyTopology);
+
+          expect(sonos.players).is.empty;
+          expect(soap.invoke).calledOnce;
+        });
+
         describe('After initialized', () => {
           beforeEach((done) => {
             sonos.on('initialized', done);
