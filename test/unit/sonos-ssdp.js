@@ -63,6 +63,15 @@ describe('Sonos-SSDP', function () {
     expect(socket.send.firstCall.args[4]).equals('239.255.255.250');
   });
 
+  it('Sends the SSDP multicast port in the HOST header', () => {
+    ssdp.start();
+    socket.bind.yield();
+
+    const search = socket.send.firstCall.args[0].toString();
+    expect(search).contains('HOST: 239.255.255.250:1900');
+    expect(search).not.contains('reservedSSDPport');
+  });
+
   it('Sends M-SEARCH periodically if no response', (done) => {
     ssdp.start();
     socket.bind.yield();
