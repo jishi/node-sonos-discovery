@@ -127,6 +127,48 @@ describe('Player', () => {
     expect(listener.on).calledTwice;
   });
 
+  describe('Modern device attributes', () => {
+
+    it('Exposes zone topology attributes from new firmware', () => {
+      const modernData = Object.assign({}, zoneMemberData, {
+        airplayenabled: '1',
+        micenabled: '0',
+        wifienabled: '1',
+        wirelessmode: '2',
+        roomcalibrationstate: '4',
+        hdmicecavailable: '1'
+      });
+
+      player = new Player(modernData, listener, system);
+
+      expect(player.airPlayEnabled).equal('1');
+      expect(player.micEnabled).equal('0');
+      expect(player.wifiEnabled).equal('1');
+      expect(player.wirelessMode).equal('2');
+      expect(player.roomCalibrationState).equal('4');
+      expect(player.hdmiCecAvailable).equal('1');
+    });
+
+    it('Leaves attributes undefined when firmware does not report them', () => {
+      const legacyData = Object.assign({}, zoneMemberData);
+      delete legacyData.airplayenabled;
+      delete legacyData.micenabled;
+      delete legacyData.wifienabled;
+      delete legacyData.wirelessmode;
+      delete legacyData.roomcalibrationstate;
+      delete legacyData.hdmicecavailable;
+
+      const legacyPlayer = new Player(legacyData, listener, system);
+
+      expect(legacyPlayer.airPlayEnabled).to.be.undefined;
+      expect(legacyPlayer.micEnabled).to.be.undefined;
+      expect(legacyPlayer.wifiEnabled).to.be.undefined;
+      expect(legacyPlayer.wirelessMode).to.be.undefined;
+      expect(legacyPlayer.roomCalibrationState).to.be.undefined;
+      expect(legacyPlayer.hdmiCecAvailable).to.be.undefined;
+    });
+  });
+
   describe('When it receives a transport-state update for queue playback', () => {
     beforeEach((done) => {
       let lastChange = require('../../data/avtransportlastchange.json');
