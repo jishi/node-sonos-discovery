@@ -87,17 +87,23 @@ describe('SonosSystem', () => {
 
     describe('If the initial device description fetch fails', () => {
 
-      beforeEach(() => {
-        request.onCall(0).rejects(new Error('ECONNREFUSED'));
-        ssdp.once.yield({
+      function found() {
+        ssdp.once.lastCall.args[1]({
           ip: '127.0.0.1',
           location: 'http://127.0.0.1:1400/xml',
           household: 'Sonos_1234567890abcdef'
         });
+      }
+
+      beforeEach(() => {
+        request.onCall(0).rejects(new Error('ECONNREFUSED'));
+        request.rejects(new Error('ECONNREFUSED'));
       });
 
       it('Restarts discovery so the api can recover', function (done) {
         this.timeout(5000);
+
+        found();
 
         setTimeout(() => {
           try {
@@ -108,6 +114,63 @@ describe('SonosSystem', () => {
             done(e);
           }
         }, 1200);
+      });
+
+      describe('When discovery keeps failing', () => {
+        let clock;
+
+        beforeEach(() => {
+          clock = sinon.useFakeTimers('setTimeout', 'clearTimeout', 'setInterval', 'clearInterval');
+        });
+
+        afterEach(() => {
+          clock.restore();
+        });
+
+        it('Backs off before each consecutive retry', (done) => {
+          found();
+
+          setImmediate(() => {
+            try {
+              clock.tick(999);
+              expect(ssdp.start).calledOnce;
+
+              clock.tick(1);
+              expect(ssdp.start).calledTwice;
+
+              found();
+
+              setImmediate(() => {
+                try {
+                  clock.tick(1999);
+                  expect(ssdp.start).calledTwice;
+
+                  clock.tick(1);
+                  expect(ssdp.start).calledThrice;
+
+                  found();
+
+                  setImmediate(() => {
+                    try {
+                      clock.tick(3999);
+                      expect(ssdp.start).calledThrice;
+
+                      clock.tick(1);
+                      expect(ssdp.start).callCount(4);
+                      done();
+                    } catch (e) {
+                      done(e);
+                    }
+                  });
+                } catch (e) {
+                  done(e);
+                }
+              });
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
       });
     });
 
