@@ -327,3 +327,129 @@ describe('SonosSystem', () => {
   });
 
 });
+
+describe('SonosSystem discovery recovery', () => {
+  let SonosSystem;
+  let ssdp;
+  let sonos;
+  let request;
+  let NotificationListener;
+  let listener;
+  let Subscriber;
+  let subscriber;
+  let Player;
+  let clock;
+
+  beforeEach(() => {
+    clock = sinon.useFakeTimers('setTimeout', 'clearTimeout', 'setInterval', 'clearInterval');
+
+    ssdp = {
+      start: sinon.spy(),
+      stop: sinon.spy(),
+      once: sinon.spy()
+    };
+
+    request = sinon.stub().resolves({
+      socket: {
+        address: function () {
+          return {
+            address: '127.0.0.2'
+          };
+        }
+      }
+    });
+
+    listener = {
+      on: sinon.spy(),
+      endpoint: sinon.stub().returns('http://127.0.0.2:3500/'),
+      dispose: sinon.spy()
+    };
+
+    NotificationListener = sinon.stub().returns(listener);
+
+    subscriber = {
+      once: sinon.spy(),
+      dispose: sinon.spy()
+    };
+    Subscriber = sinon.stub().returns(subscriber);
+
+    Player = sinon.spy(proxyquire('../../lib/models/Player', {
+      '../Subscriber': Subscriber
+    }));
+
+    sinon.stub(soap, 'invoke').resolves(fs.createReadStream(`${__dirname}/../data/listavailableservices.xml`));
+
+    SonosSystem = proxyquire('../../lib/SonosSystem', {
+      './sonos-ssdp': ssdp,
+      './helpers/request': request,
+      './NotificationListener': NotificationListener,
+      './Subscriber': Subscriber,
+      './models/Player': Player
+    });
+  });
+
+  afterEach(() => {
+    clock.restore();
+    soap.invoke.restore();
+  });
+
+  function discover() {
+    sonos = new SonosSystem();
+    ssdp.once.yield({
+      ip: '127.0.0.1',
+      location: 'http://127.0.0.1:1400/xml',
+      household: 'Sonos_1234567890abcdef'
+    });
+  }
+
+  function subscribe(done) {
+    setImmediate(() => {
+      listener.on.withArgs('listening').yield();
+      done();
+    });
+  }
+
+  it('Restarts discovery when no topology notification arrives', (done) => {
+    discover();
+    subscribe(() => {
+      clock.tick(29999);
+      expect(ssdp.start).calledOnce;
+
+      clock.tick(1);
+      expect(ssdp.stop).calledThrice;
+      expect(ssdp.start).calledTwice;
+      expect(subscriber.dispose).calledOnce;
+      expect(listener.dispose).calledOnce;
+      done();
+    });
+  });
+
+  it('Does not restart discovery while players are present', (done) => {
+    discover();
+    subscribe(() => {
+      listener.on.withArgs('topology').yield('', require('../data/topology.json'));
+
+      clock.tick(30000);
+      expect(ssdp.start).calledOnce;
+      done();
+    });
+  });
+
+  it('Restarts discovery when the topology loses all players', (done) => {
+    discover();
+    subscribe(() => {
+      listener.on.withArgs('topology').yield('', require('../data/topology.json'));
+      listener.on.withArgs('topology').yield('', [{
+        $attrs: { coordinator: 'RINCON_VANISHED', id: 'RINCON_VANISHED:0' },
+        zonegroupmember: { uuid: 'RINCON_VANISHED', invisible: '1', zonename: 'Offline' }
+      }]);
+
+      clock.tick(29999);
+      expect(ssdp.start).calledOnce;
+
+      clock.tick(1);
+      expect(ssdp.start).calledTwice;
+      done();
+    });
+  });
+});
