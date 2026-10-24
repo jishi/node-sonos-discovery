@@ -4,37 +4,30 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 require('chai').use(require('sinon-chai'));
 
+function createSocketStub() {
+  return {
+    bind: sinon.spy(),
+    setMulticastTTL: sinon.spy(),
+    setBroadcast: sinon.spy(),
+    close: sinon.spy(),
+    send: sinon.spy(),
+    on: sinon.spy()
+  };
+}
+
 describe('Sonos-SSDP', function () {
   let ssdp;
   let dgram;
   let socket;
-  let os;
 
   beforeEach(() => {
-    socket = {
-      bind: sinon.spy(),
-      setMulticastTTL: sinon.spy(),
-      setBroadcast: sinon.spy(),
-      close: sinon.spy(),
-      send: sinon.spy(),
-      on: sinon.spy()
-    };
+    socket = createSocketStub();
     dgram = {
       createSocket: sinon.stub().returns(socket)
     };
-    os = {
-      networkInterfaces: sinon.stub().returns({
-        eth0: [{
-          internal: false,
-          family: 'IPv4',
-          address: '10.0.0.1'
-        }]
-      })
-    };
 
     ssdp = proxyquire('../../lib/sonos-ssdp', {
-      dgram,
-      os
+      dgram
     });
   });
 
@@ -74,15 +67,39 @@ describe('Sonos-SSDP', function () {
     }, 1500);
   });
 
-  it('Switches interface if more than 5 seconds elapse', function (done) {
-    this.timeout(10000);
-    ssdp.start();
-    socket.bind.yield();
-    setTimeout(() => {
-      expect(socket.bind).calledTwice;
-      expect(socket.bind.secondCall.args[1]).equals('10.0.0.1');
-      done();
-    }, 5500);
+  it('Does not recreate the socket after the scan interval', () => {
+    const clock = sinon.useFakeTimers();
+
+    try {
+      ssdp.start();
+      socket.bind.yield();
+
+      clock.tick(6000);
+
+      expect(dgram.createSocket).calledOnce;
+      expect(socket.bind).calledOnce;
+    } finally {
+      clock.restore();
+    }
+  });
+
+  it('Binds to a configured interface', () => {
+    ssdp.start({ interface: '10.0.0.1' });
+
+    expect(socket.bind).calledOnce;
+    expect(socket.bind.firstCall.args[1]).equals('10.0.0.1');
+  });
+
+  it('Binds to each configured interface', () => {
+    const secondSocket = createSocketStub();
+    dgram.createSocket.onFirstCall().returns(socket);
+    dgram.createSocket.onSecondCall().returns(secondSocket);
+
+    ssdp.start({ interface: ['10.0.0.1', '10.0.0.2'] });
+
+    expect(dgram.createSocket).calledTwice;
+    expect(socket.bind.firstCall.args[1]).equals('10.0.0.1');
+    expect(secondSocket.bind.firstCall.args[1]).equals('10.0.0.2');
   });
 
   it('Emits upon successful resolve', () => {
@@ -115,5 +132,25 @@ describe('Sonos-SSDP', function () {
     ssdp.stop();
 
     expect(socket.close).calledOnce;
+  });
+
+  it('Closes all sockets if stop is invoked', () => {
+    const secondSocket = createSocketStub();
+    dgram.createSocket.onFirstCall().returns(socket);
+    dgram.createSocket.onSecondCall().returns(secondSocket);
+
+    ssdp.start({ interface: ['10.0.0.1', '10.0.0.2'] });
+    ssdp.stop();
+
+    expect(socket.close).calledOnce;
+    expect(secondSocket.close).calledOnce;
+  });
+
+  it('Closes existing sockets when started again', () => {
+    ssdp.start();
+    ssdp.start();
+
+    expect(socket.close).calledOnce;
+    expect(dgram.createSocket).calledTwice;
   });
 });

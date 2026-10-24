@@ -17,7 +17,10 @@ https://github.com/jishi/node-sonos-web-controller (old version)
 Options
 -------
 
-
+- `interface`: IPv4 address, or array of addresses, to bind the SSDP socket to.
+  Defaults to `0.0.0.0` (all interfaces). Set this when running on a multi-homed
+  host (for example VMware or a host with `docker0`) where the default route
+  does not point at the Sonos network.
 
 Contributions
 -------------
