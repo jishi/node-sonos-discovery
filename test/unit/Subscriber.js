@@ -39,7 +39,8 @@ describe('Subscriber', () => {
           NT: 'upnp:event',
           TIMEOUT: 'Second-600'
         },
-        type: 'stream'
+        type: 'stream',
+        timeout: 10000
       });
     });
 
@@ -53,6 +54,7 @@ describe('Subscriber', () => {
           uri: 'http://192.168.1.151:1400/test/path',
           method: 'SUBSCRIBE',
           type: 'stream',
+          timeout: 10000,
           headers: {
             CALLBACK: '<http://127.0.0.2/>',
             NT: 'upnp:event',
@@ -61,6 +63,31 @@ describe('Subscriber', () => {
         });
         done();
       }, 150);
+    });
+  });
+
+  describe('dispose', () => {
+    it('Only sends one UNSUBSCRIBE when disposed twice', (done) => {
+      request.resolves(successfulRequest);
+      const localSubscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
+
+      setImmediate(() => {
+        localSubscriber.dispose();
+        localSubscriber.dispose();
+        expect(request).calledTwice;
+        done();
+      });
+    });
+
+    it('Does not send UNSUBSCRIBE when there is no SID', (done) => {
+      request.rejects(new Error('subscribe failed'));
+      const localSubscriber = new Subscriber('http://192.168.1.151:1400/test/path', 'http://127.0.0.2/', 600);
+
+      setImmediate(() => {
+        localSubscriber.dispose();
+        expect(request).calledOnce;
+        done();
+      });
     });
   });
 
@@ -89,6 +116,7 @@ describe('Subscriber', () => {
           uri: 'http://192.168.1.151:1400/test/path',
           method: 'SUBSCRIBE',
           type: 'stream',
+          timeout: 10000,
           headers: {
             TIMEOUT: 'Second-0.1',
             SID: '12345678'
@@ -99,6 +127,7 @@ describe('Subscriber', () => {
           uri: 'http://192.168.1.151:1400/test/path',
           method: 'SUBSCRIBE',
           type: 'stream',
+          timeout: 10000,
           headers: {
             CALLBACK: '<http://127.0.0.2/>',
             NT: 'upnp:event',
@@ -123,6 +152,7 @@ describe('Subscriber', () => {
           uri: 'http://192.168.1.151:1400/test/path',
           method: 'SUBSCRIBE',
           type: 'stream',
+          timeout: 10000,
           headers: {
             TIMEOUT: 'Second-0.1',
             SID: '1234567890'
@@ -147,6 +177,7 @@ describe('Subscriber', () => {
         expect(request.secondCall.args[0]).eql({
           method: 'UNSUBSCRIBE',
           type: 'stream',
+          timeout: 10000,
           uri: 'http://192.168.1.151:1400/test/path',
           headers: {
             SID: '1234567890'

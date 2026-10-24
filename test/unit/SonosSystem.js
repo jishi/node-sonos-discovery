@@ -199,6 +199,10 @@ describe('SonosSystem', () => {
         expect(sonos.localEndpoint).equals('127.0.0.2');
       });
 
+      it('Applies a timeout to the device description fetch', () => {
+        expect(request.firstCall.args[0].timeout).equals(10000);
+      });
+
       it('Starts a NotificationListener', () => {
         expect(NotificationListener).calledWithNew;
       });
@@ -416,3 +420,4 @@ describe('SonosSystem', () => {
   });
 
 });
+
